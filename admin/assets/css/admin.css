@@ -231,6 +231,14 @@ input, select, textarea, button { font-family: var(--font); }
 .modal-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
 .modal-footer { display: flex; justify-content: flex-end; gap: 8px; padding: 16px 20px; border-top: 1px solid var(--border); }
 
+/* ===== WAITLIST ===== */
+.filter-input { padding: 7px 12px; font-size: 0.8rem; background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); outline: none; min-width: 140px; }
+.filter-input:focus { border-color: var(--blue); }
+.filter-date { width: 130px; }
+.filters-actions { display: flex; align-items: center; gap: 12px; }
+.source-badge { font-size: 0.75rem; padding: 2px 10px; border-radius: 100px; background: var(--blue-dim); color: var(--blue); }
+.text-muted { color: var(--text-muted); }
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1024px) {
     .stats-row { grid-template-columns: repeat(2, 1fr); }

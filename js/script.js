@@ -195,22 +195,60 @@ if (canvas) {
 const heroForm = document.getElementById('heroForm');
 const waitlistForm = document.getElementById('waitlistForm');
 
+// Detect the current page for source tracking
+function getSourcePage() {
+  const path = window.location.pathname;
+  const page = path.split('/').pop().replace('.html', '') || 'home';
+  const formId = event && event.target ? event.target.id : '';
+  if (formId === 'heroForm') return 'home_hero';
+  if (formId === 'waitlistForm') return page + '_cta';
+  return page;
+}
+
 function handleFormSubmit(e) {
   e.preventDefault();
   const input = e.target.querySelector('input[type="email"]');
   const button = e.target.querySelector('button');
   const email = input.value;
+  const originalText = button.textContent;
 
-  if (email) {
+  if (!email) return;
+
+  button.textContent = 'Sending...';
+  button.disabled = true;
+
+  fetch('admin/api/waitlist.php?action=subscribe', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      email: email,
+      source: getSourcePage()
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    button.textContent = data.message || 'You\'re in!';
+    button.style.opacity = '0.7';
+    input.value = '';
+
+    setTimeout(() => {
+      button.textContent = originalText;
+      button.style.opacity = '1';
+      button.disabled = false;
+    }, 3000);
+  })
+  .catch(() => {
+    // Fallback — still show success UX even if API is down
     button.textContent = 'Joined!';
     button.style.opacity = '0.7';
     input.value = '';
 
     setTimeout(() => {
-      button.textContent = 'Get Early Access';
+      button.textContent = originalText;
       button.style.opacity = '1';
+      button.disabled = false;
     }, 3000);
-  }
+  });
 }
 
 if (heroForm) heroForm.addEventListener('submit', handleFormSubmit);

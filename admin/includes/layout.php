@@ -34,10 +34,9 @@ function renderHeader(string $pageTitle, string $activePage = ''): void {
 
                 <div class="nav-group">
                     <span class="nav-group-label">Manage</span>
-                    <a href="#" class="nav-item disabled" title="Phase 2">
+                    <a href="waitlist.php" class="nav-item <?= $activePage === 'waitlist' ? 'active' : '' ?>">
                         <svg viewBox="0 0 20 20" fill="currentColor" width="18" height="18"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>
                         <span>Waitlist</span>
-                        <span class="nav-badge soon">P2</span>
                     </a>
                     <a href="#" class="nav-item disabled" title="Phase 3">
                         <svg viewBox="0 0 20 20" fill="currentColor" width="18" height="18"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zm-4 0H9v2h2V9z" clip-rule="evenodd"/></svg>

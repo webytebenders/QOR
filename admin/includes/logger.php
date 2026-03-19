@@ -53,7 +53,9 @@ function formatAction(array $log): string {
         'update_profile'=> 'updated their profile',
         'enable_2fa'    => 'enabled 2FA',
         'disable_2fa'   => 'disabled 2FA',
-        'reset_password'=> 'reset password',
+        'reset_password'  => 'reset password',
+        'export_waitlist' => 'exported waitlist to CSV',
+        'delete_waitlist' => 'deleted waitlist entry',
     ];
     return $actions[$log['action']] ?? $log['action'];
 }
