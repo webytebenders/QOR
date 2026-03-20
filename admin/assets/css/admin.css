@@ -231,6 +231,50 @@ input, select, textarea, button { font-family: var(--font); }
 .modal-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
 .modal-footer { display: flex; justify-content: flex-end; gap: 8px; padding: 16px 20px; border-top: 1px solid var(--border); }
 
+/* ===== BLOG / POSTS ===== */
+.post-title-cell { display: flex; align-items: center; gap: 6px; }
+.post-link { color: var(--text); font-weight: 600; transition: color var(--transition); }
+.post-link:hover { color: var(--blue); }
+.featured-star { color: var(--orange); font-size: 1rem; }
+.cat-badge { font-size: 0.7rem; font-weight: 600; padding: 3px 10px; border-radius: 100px; }
+.cat-technology { background: var(--blue-dim); color: var(--blue); }
+.cat-security { background: var(--orange-dim); color: var(--orange); }
+.cat-ecosystem { background: var(--green-dim); color: var(--green); }
+.cat-announcements { background: var(--purple-dim); color: var(--purple); }
+.post-status-draft { background: rgba(255,255,255,0.05); color: var(--text-muted); }
+.post-status-published { background: var(--green-dim); color: var(--green); }
+.post-status-scheduled { background: var(--blue-dim); color: var(--blue); }
+
+/* Post Editor */
+.editor-grid { display: grid; grid-template-columns: 1fr 300px; gap: 20px; align-items: start; }
+.editor-title-input { font-size: 1.3rem !important; font-family: var(--font-heading) !important; font-weight: 600 !important; }
+.slug-input-wrap { display: flex; align-items: center; background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
+.slug-prefix { padding: 10px 0 10px 14px; font-size: 0.85rem; color: var(--text-muted); white-space: nowrap; }
+.slug-input-wrap input { border: none !important; background: none !important; padding-left: 4px !important; }
+
+/* Rich Text Editor */
+.editor-toolbar { display: flex; align-items: center; gap: 2px; padding: 8px; background: var(--bg); border: 1px solid var(--border); border-bottom: none; border-radius: var(--radius-sm) var(--radius-sm) 0 0; flex-wrap: wrap; }
+.toolbar-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: none; border: 1px solid transparent; border-radius: 4px; color: var(--text-secondary); cursor: pointer; font-size: 0.85rem; transition: all var(--transition); }
+.toolbar-btn:hover { background: var(--bg-hover); border-color: var(--border); color: var(--text); }
+.toolbar-sep { width: 1px; height: 20px; background: var(--border); margin: 0 4px; }
+.editor-content { min-height: 300px; padding: 16px; background: var(--bg-input); border: 1px solid var(--border); border-radius: 0 0 var(--radius-sm) var(--radius-sm); font-size: 0.9rem; line-height: 1.8; color: var(--text); outline: none; overflow-y: auto; }
+.editor-content:focus { border-color: var(--blue); }
+.editor-content h2 { font-family: var(--font-heading); font-size: 1.3rem; margin: 16px 0 8px; }
+.editor-content h3 { font-family: var(--font-heading); font-size: 1.1rem; margin: 12px 0 6px; }
+.editor-content p { margin-bottom: 12px; }
+.editor-content ul, .editor-content ol { margin-left: 20px; margin-bottom: 12px; }
+.editor-content blockquote { border-left: 3px solid var(--blue); padding-left: 16px; margin: 12px 0; color: var(--text-secondary); font-style: italic; }
+.editor-content a { color: var(--blue); }
+
+.editor-actions { margin-top: 16px; }
+.editor-meta { margin-top: 16px; font-size: 0.75rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 4px; }
+.checkbox-label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.85rem; }
+.checkbox-label input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--blue); }
+
+@media (max-width: 768px) {
+    .editor-grid { grid-template-columns: 1fr; }
+}
+
 /* ===== MESSAGES ===== */
 .msg-back { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
 .msg-actions-top { display: flex; gap: 8px; }

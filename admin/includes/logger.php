@@ -61,6 +61,10 @@ function formatAction(array $log): string {
         'update_contact_status' => 'updated message status',
         'delete_contact'        => 'deleted a message',
         'export_contacts'       => 'exported messages to CSV',
+        'create_post'           => 'created a blog post',
+        'update_post'           => 'updated a blog post',
+        'delete_post'           => 'deleted a blog post',
+        'feature_post'          => 'set a post as featured',
     ];
     return $actions[$log['action']] ?? $log['action'];
 }

@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS posts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    slug VARCHAR(255) NOT NULL UNIQUE,
+    excerpt TEXT,
+    content LONGTEXT NOT NULL,
+    category ENUM('technology','security','ecosystem','announcements') NOT NULL DEFAULT 'technology',
+    status ENUM('draft','published','scheduled') NOT NULL DEFAULT 'draft',
+    is_featured TINYINT(1) NOT NULL DEFAULT 0,
+    thumbnail VARCHAR(500) NULL,
+    author_id INT NOT NULL,
+    published_at DATETIME NULL,
+    scheduled_at DATETIME NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (author_id) REFERENCES admins(id),
+    INDEX idx_slug (slug),
+    INDEX idx_status (status),
+    INDEX idx_category (category),
+    INDEX idx_featured (is_featured),
+    INDEX idx_published (published_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
