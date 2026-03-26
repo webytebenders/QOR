@@ -76,6 +76,11 @@ function formatAction(array $log): string {
         'generate_sitemap'      => 'generated sitemap.xml',
         'update_robots'         => 'updated robots.txt',
         'update_chatbot'        => 'updated chatbot settings',
+        'upload_media'          => 'uploaded a file',
+        'update_media'          => 'updated media details',
+        'delete_media'          => 'deleted a file',
+        'update_settings'       => 'updated settings',
+        'purge_activity'        => 'purged old activity logs',
     ];
     return $actions[$log['action']] ?? $log['action'];
 }

@@ -175,6 +175,58 @@ class Mailer {
     }
 }
 
+// ===== DB TEMPLATE LOADER =====
+
+function ensureEmailTemplatesTable(): void {
+    static $done = false;
+    if ($done) return;
+    try {
+        $db = getDB();
+        $schema = file_get_contents(__DIR__ . '/schema_email_templates.sql');
+        foreach (explode(';', $schema) as $sql) {
+            $sql = trim($sql);
+            if ($sql) { try { $db->exec($sql); } catch (\Exception $e) {} }
+        }
+    } catch (\Exception $e) {}
+    $done = true;
+}
+
+function getDbTemplate(string $slug): ?array {
+    try {
+        ensureEmailTemplatesTable();
+        $db = getDB();
+        $stmt = $db->prepare('SELECT * FROM email_templates WHERE slug = ? AND is_active = 1');
+        $stmt->execute([$slug]);
+        return $stmt->fetch() ?: null;
+    } catch (\Exception $e) {
+        return null;
+    }
+}
+
+function renderTemplate(string $slug, array $vars = [], string $unsubscribeUrl = ''): string {
+    $tpl = getDbTemplate($slug);
+    if ($tpl) {
+        $body = $tpl['body'];
+        foreach ($vars as $key => $val) {
+            $body = str_replace('{{' . $key . '}}', htmlspecialchars($val), $body);
+        }
+        return getEmailWrapper($body, $unsubscribeUrl);
+    }
+    return '';
+}
+
+function getTemplateSubject(string $slug, array $vars = []): string {
+    $tpl = getDbTemplate($slug);
+    if ($tpl) {
+        $subject = $tpl['subject'];
+        foreach ($vars as $key => $val) {
+            $subject = str_replace('{{' . $key . '}}', $val, $subject);
+        }
+        return $subject;
+    }
+    return '';
+}
+
 // ===== EMAIL TEMPLATES =====
 
 function getEmailWrapper(string $content, string $unsubscribeUrl = ''): string {
@@ -199,44 +251,31 @@ function getEmailWrapper(string $content, string $unsubscribeUrl = ''): string {
 }
 
 function getWaitlistWelcomeEmail(): string {
-    return getEmailWrapper('
-        <h2 style="font-family:\'Space Grotesk\',sans-serif;font-size:24px;font-weight:700;color:#f0f0f5;margin:0 0 16px;">You\'re on the list!</h2>
-        <p style="color:#9999aa;">Thanks for joining the Core Chain waitlist. You\'re now among the first to experience sovereign biometric banking.</p>
-        <p style="color:#9999aa;">Here\'s what to expect:</p>
-        <ul style="color:#9999aa;padding-left:20px;">
-            <li>Early access to the biometric wallet</li>
-            <li>Development updates and milestones</li>
-            <li>Priority access to the token launch</li>
-        </ul>
-        <p style="color:#9999aa;">In the meantime, read our <a href="' . APP_URL . '/Whitepaper%20QOR.pdf" style="color:#4FC3F7;">Whitepaper</a> to learn more.</p>
-        <p style="color:#9999aa;">— The Core Chain Team</p>
-    ');
+    $db = renderTemplate('waitlist_welcome');
+    if ($db) return $db;
+    return getEmailWrapper('<h2 style="font-family:\'Space Grotesk\',sans-serif;font-size:24px;font-weight:700;color:#f0f0f5;margin:0 0 16px;">You\'re on the list!</h2><p style="color:#9999aa;">Thanks for joining the Core Chain waitlist.</p><p style="color:#9999aa;">— The Core Chain Team</p>');
 }
 
 function getContactAutoReplyEmail(string $name): string {
-    return getEmailWrapper('
-        <h2 style="font-family:\'Space Grotesk\',sans-serif;font-size:24px;font-weight:700;color:#f0f0f5;margin:0 0 16px;">Message Received</h2>
-        <p style="color:#9999aa;">Hi ' . htmlspecialchars($name) . ',</p>
-        <p style="color:#9999aa;">Thanks for reaching out. We\'ve received your message and our team will get back to you within 48 hours.</p>
-        <p style="color:#9999aa;">In the meantime, you might find answers in our <a href="' . APP_URL . '/contact.html#faq" style="color:#4FC3F7;">FAQ</a>.</p>
-        <p style="color:#9999aa;">— The Core Chain Team</p>
-    ');
+    $db = renderTemplate('contact_autoreply', ['name' => $name]);
+    if ($db) return $db;
+    return getEmailWrapper('<h2 style="font-family:\'Space Grotesk\',sans-serif;font-size:24px;font-weight:700;color:#f0f0f5;margin:0 0 16px;">Message Received</h2><p style="color:#9999aa;">Hi ' . htmlspecialchars($name) . ',</p><p style="color:#9999aa;">Thanks for reaching out. We\'ll get back to you within 48 hours.</p><p style="color:#9999aa;">— The Core Chain Team</p>');
 }
 
 function getContactReplyEmail(string $name, string $replyText): string {
-    return getEmailWrapper('
-        <h2 style="font-family:\'Space Grotesk\',sans-serif;font-size:24px;font-weight:700;color:#f0f0f5;margin:0 0 16px;">Reply from Core Chain</h2>
-        <p style="color:#9999aa;">Hi ' . htmlspecialchars($name) . ',</p>
-        <div style="padding:16px 20px;background:rgba(79,195,247,0.04);border-left:3px solid #4FC3F7;border-radius:0 8px 8px 0;margin:16px 0;color:#f0f0f5;font-size:15px;line-height:1.7;">' . nl2br(htmlspecialchars($replyText)) . '</div>
-        <p style="color:#9999aa;">— The Core Chain Team</p>
-    ');
+    $db = renderTemplate('contact_reply', ['name' => $name, 'reply_text' => nl2br($replyText)]);
+    if ($db) return $db;
+    return getEmailWrapper('<h2 style="font-family:\'Space Grotesk\',sans-serif;font-size:24px;font-weight:700;color:#f0f0f5;margin:0 0 16px;">Reply from Core Chain</h2><p style="color:#9999aa;">Hi ' . htmlspecialchars($name) . ',</p><div style="padding:16px 20px;background:rgba(79,195,247,0.04);border-left:3px solid #4FC3F7;border-radius:0 8px 8px 0;margin:16px 0;color:#f0f0f5;font-size:15px;line-height:1.7;">' . nl2br(htmlspecialchars($replyText)) . '</div><p style="color:#9999aa;">— The Core Chain Team</p>');
+}
+
+function getContactAdminNotificationEmail(string $name, string $email, string $subject, string $message): string {
+    $db = renderTemplate('contact_admin_notify', ['name' => $name, 'email' => $email, 'subject' => $subject, 'message' => nl2br($message)]);
+    if ($db) return $db;
+    return getEmailWrapper('<h2 style="font-family:\'Space Grotesk\',sans-serif;font-size:24px;font-weight:700;color:#f0f0f5;margin:0 0 16px;">New Contact Message</h2><p style="color:#9999aa;">From: ' . htmlspecialchars($name) . ' &lt;' . htmlspecialchars($email) . '&gt;</p><p style="color:#9999aa;">' . nl2br(htmlspecialchars($message)) . '</p>');
 }
 
 function getSubscriberWelcomeEmail(string $unsubscribeUrl): string {
-    return getEmailWrapper('
-        <h2 style="font-family:\'Space Grotesk\',sans-serif;font-size:24px;font-weight:700;color:#f0f0f5;margin:0 0 16px;">You\'re subscribed!</h2>
-        <p style="color:#9999aa;">Welcome to the Core Chain newsletter. You\'ll receive the latest updates on biometric finance, security research, and ecosystem development.</p>
-        <p style="color:#9999aa;">We only send when we have something worth reading. No spam, ever.</p>
-        <p style="color:#9999aa;">— The Core Chain Team</p>
-    ', $unsubscribeUrl);
+    $db = renderTemplate('newsletter_welcome', ['unsubscribe_url' => $unsubscribeUrl], $unsubscribeUrl);
+    if ($db) return $db;
+    return getEmailWrapper('<h2 style="font-family:\'Space Grotesk\',sans-serif;font-size:24px;font-weight:700;color:#f0f0f5;margin:0 0 16px;">You\'re subscribed!</h2><p style="color:#9999aa;">Welcome to the Core Chain newsletter.</p><p style="color:#9999aa;">— The Core Chain Team</p>', $unsubscribeUrl);
 }

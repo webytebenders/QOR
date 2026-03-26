@@ -62,11 +62,20 @@ if ($action === 'submit' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SERVER['HTTP_USER_AGENT'] ?? ''
         ]);
 
-        // Send auto-reply
+        // Send auto-reply to user
         try {
             require_once '../includes/mailer.php';
             $mailer = new Mailer();
             $mailer->send($email, 'We received your message — Core Chain', getContactAutoReplyEmail($name));
+        } catch (Exception $e) { /* silently fail */ }
+
+        // Notify admin of new message
+        try {
+            if (!isset($mailer)) {
+                require_once '../includes/mailer.php';
+                $mailer = new Mailer();
+            }
+            $mailer->send(SMTP_FROM_EMAIL, 'New Contact: ' . $subject . ' — ' . $name, getContactAdminNotificationEmail($name, $email, $subject, $message));
         } catch (Exception $e) { /* silently fail */ }
 
         jsonResponse(['success' => true, 'message' => 'Message sent! We\'ll get back to you within 48 hours.']);
@@ -136,7 +145,7 @@ if ($action === 'reply' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
         require_once '../includes/logger.php';
         logActivity($_SESSION['admin_id'], 'reply_contact', 'contact', $id);
-        setFlash('success', 'Reply saved. Email sending will be available in Phase 6.');
+        setFlash('success', 'Reply sent successfully.');
     }
     redirect('../messages.php?view=' . $id);
 }

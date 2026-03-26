@@ -106,6 +106,13 @@ renderHeader('Newsletter', 'newsletter');
         <?php if ($search || $filterStatus): ?><a href="newsletter.php?tab=subscribers" class="btn btn-ghost btn-sm">Clear</a><?php endif; ?>
     </form>
     <div class="filters-actions">
+        <form method="POST" action="api/newsletter.php?action=import_waitlist" style="display:inline" onsubmit="return confirm('Import all waitlist members who are not yet newsletter subscribers?')">
+            <?= csrfField() ?>
+            <button type="submit" class="btn btn-secondary btn-sm">
+                <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>
+                Import from Waitlist
+            </button>
+        </form>
         <a href="api/newsletter.php?action=export&status=<?= urlencode($filterStatus) ?>" class="btn btn-secondary btn-sm">
             <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
             Export CSV

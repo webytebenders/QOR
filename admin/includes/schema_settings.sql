@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS settings (
+    setting_key VARCHAR(100) PRIMARY KEY,
+    setting_value TEXT DEFAULT NULL,
+    setting_group VARCHAR(50) NOT NULL DEFAULT 'general',
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_group (setting_group)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

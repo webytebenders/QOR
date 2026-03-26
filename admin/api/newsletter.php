@@ -189,6 +189,45 @@ if ($action === 'delete_campaign' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     redirect('../newsletter.php?tab=campaigns');
 }
 
+// ===== ADMIN: Import Waitlist to Newsletter =====
+if ($action === 'import_waitlist' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_once '../includes/auth.php';
+    startSecureSession();
+    requireRole('super_admin');
+
+    $token = $_POST[CSRF_TOKEN_NAME] ?? '';
+    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../newsletter.php'); }
+
+    $db = getDB();
+
+    // Get all waitlist emails not already in subscribers
+    $stmt = $db->query("SELECT w.email FROM waitlist w LEFT JOIN subscribers s ON w.email = s.email WHERE s.id IS NULL");
+    $newEmails = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+    if (empty($newEmails)) {
+        setFlash('info', 'All waitlist members are already subscribed to the newsletter.');
+        redirect('../newsletter.php');
+    }
+
+    $imported = 0;
+    $insertStmt = $db->prepare('INSERT INTO subscribers (email, source, unsubscribe_token, ip_address, subscribed_at) VALUES (?, ?, ?, ?, NOW())');
+
+    foreach ($newEmails as $email) {
+        try {
+            $unsubToken = bin2hex(random_bytes(32));
+            $insertStmt->execute([$email, 'waitlist_import', $unsubToken, '']);
+            $imported++;
+        } catch (Exception $e) {
+            // Skip duplicates or errors
+        }
+    }
+
+    require_once '../includes/logger.php';
+    logActivity($_SESSION['admin_id'], 'import_waitlist_to_newsletter', 'subscriber', null, ['count' => $imported]);
+    setFlash('success', "{$imported} waitlist members imported to newsletter subscribers.");
+    redirect('../newsletter.php');
+}
+
 // ===== ADMIN: Send Campaign =====
 if ($action === 'send_campaign' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     // Handled by api/email.php?action=send_campaign

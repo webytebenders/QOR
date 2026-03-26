@@ -70,7 +70,7 @@
 
 
   <!-- ===== SECTION 2: FEATURED POST ===== -->
-  <section class="section blog-featured" id="featured">
+  <section class="section blog-featured" id="featured" style="display:none">
     <div class="container" style="position: relative;">
       <svg class="fingerprint-watermark" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
   <path d="M100 20c-44 0-80 36-80 80s36 80 80 80 80-36 80-80-36-80-80-80zm0 10c39 0 70 31 70 70s-31 70-70 70-70-31-70-70 31-70 70-70z" stroke="#4FC3F7" stroke-width="1"/>
@@ -78,29 +78,7 @@
   <path d="M100 60c-22 0-40 18-40 40s18 40 40 40 40-18 40-40-18-40-40-40zm0 10c17 0 30 13 30 30s-13 30-30 30-30-13-30-30 13-30 30-30z" stroke="#4FC3F7" stroke-width="1"/>
   <circle cx="100" cy="100" r="12" stroke="#4FC3F7" stroke-width="1"/>
 </svg>
-      <div class="blog-feat-card" data-aos>
-        <div class="blog-feat-img">
-          <div class="blog-feat-img-inner">
-            <svg viewBox="0 0 120 120" width="80" height="80" fill="none">
-              <circle cx="60" cy="44" r="20" stroke="#4FC3F7" stroke-width="1.5" stroke-dasharray="4 3"/>
-              <circle cx="60" cy="44" r="10" stroke="#F97316" stroke-width="1.5"/>
-              <circle cx="60" cy="44" r="3" fill="#F97316"/>
-              <path d="M30 100c0-16.6 13.4-30 30-30s30 13.4 30 100" stroke="#4FC3F7" stroke-width="1.5" opacity="0.4"/>
-              <path d="M40 90l12-12 12 8 16-20" stroke="#F97316" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
-            </svg>
-          </div>
-          <span class="blog-feat-badge">Featured</span>
-        </div>
-        <div class="blog-feat-body">
-          <div class="blog-meta">
-            <span class="blog-category">Security</span>
-            <span class="blog-date">Coming Soon</span>
-          </div>
-          <h2>The End of Seed Phrases: Why Biometric Authentication Is the Future of Crypto</h2>
-          <p>$200B+ in crypto has been permanently lost to forgotten seed phrases, phishing attacks, and complexity. The 12-word recovery phrase was designed for engineers — not the next billion users. Here's why biometric authentication changes everything, and how QOR is leading the shift to sovereign identity-based wallets.</p>
-          <span class="blog-read-more">Read Article <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        </div>
-      </div>
+      <div class="blog-feat-card" data-aos id="featuredCard"></div>
     </div>
   </section>
 
@@ -111,127 +89,12 @@
       <p class="section-tag">Latest Articles</p>
       <h2 class="section-title">Deep Dives & Updates</h2>
 
-      <div class="blog-filters" data-aos>
+      <div class="blog-filters" data-aos id="blogFilters">
         <button class="blog-filter active" data-filter="all">All</button>
-        <button class="blog-filter" data-filter="tech">Technology</button>
-        <button class="blog-filter" data-filter="security">Security</button>
-        <button class="blog-filter" data-filter="ecosystem">Ecosystem</button>
-        <button class="blog-filter" data-filter="announcements">Announcements</button>
       </div>
 
-      <div class="blog-grid">
-        <article class="blog-card" data-category="tech" data-aos>
-          <div class="blog-card-img blog-img-tech">
-            <svg viewBox="0 0 80 80" width="44" height="44" fill="none">
-              <rect x="10" y="10" width="60" height="60" rx="8" stroke="#4FC3F7" stroke-width="1"/>
-              <path d="M25 50l10-15 10 10 15-20" stroke="#F97316" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              <circle cx="25" cy="50" r="2" fill="#F97316"/>
-              <circle cx="60" cy="25" r="2" fill="#F97316"/>
-            </svg>
-          </div>
-          <div class="blog-card-body">
-            <div class="blog-meta">
-              <span class="blog-category">Technology</span>
-              <span class="blog-date">Coming Soon</span>
-            </div>
-            <h3>SIMD-0075: A Game Changer for Biometric Wallets</h3>
-            <p>How Solana's native biometric signature verification opens the door for QOR's architecture — and why no other chain can replicate it.</p>
-          </div>
-        </article>
-
-        <article class="blog-card" data-category="security" data-aos>
-          <div class="blog-card-img blog-img-security">
-            <svg viewBox="0 0 80 80" width="44" height="44" fill="none">
-              <path d="M40 10L12 24v16c0 18 12 30 28 32 16-2 28-14 28-32V24L40 10z" stroke="#4FC3F7" stroke-width="1"/>
-              <path d="M30 42l7 7 13-13" stroke="#F97316" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <div class="blog-card-body">
-            <div class="blog-meta">
-              <span class="blog-category">Security</span>
-              <span class="blog-date">Coming Soon</span>
-            </div>
-            <h3>Compliance Without Surveillance: The ZK Revolution</h3>
-            <p>How zero-knowledge proofs allow institutions to verify identity without exposing user data. The end of the privacy vs compliance trade-off.</p>
-          </div>
-        </article>
-
-        <article class="blog-card" data-category="ecosystem" data-aos>
-          <div class="blog-card-img blog-img-eco">
-            <svg viewBox="0 0 80 80" width="44" height="44" fill="none">
-              <circle cx="40" cy="40" r="24" stroke="#4FC3F7" stroke-width="1"/>
-              <circle cx="40" cy="40" r="12" stroke="#F97316" stroke-width="1" stroke-dasharray="3 2"/>
-              <circle cx="40" cy="40" r="4" fill="#F97316"/>
-              <line x1="40" y1="4" x2="40" y2="16" stroke="#4FC3F7" stroke-width="1" opacity="0.4"/>
-              <line x1="40" y1="64" x2="40" y2="76" stroke="#4FC3F7" stroke-width="1" opacity="0.4"/>
-              <line x1="4" y1="40" x2="16" y2="40" stroke="#4FC3F7" stroke-width="1" opacity="0.4"/>
-              <line x1="64" y1="40" x2="76" y2="40" stroke="#4FC3F7" stroke-width="1" opacity="0.4"/>
-            </svg>
-          </div>
-          <div class="blog-card-body">
-            <div class="blog-meta">
-              <span class="blog-category">Ecosystem</span>
-              <span class="blog-date">Coming Soon</span>
-            </div>
-            <h3>The Octane Bonding Model: Why Node Economics Matter</h3>
-            <p>A deep dive into QOR's bonding mechanism — how relayer nodes create a self-reinforcing flywheel of demand, security, and value.</p>
-          </div>
-        </article>
-
-        <article class="blog-card" data-category="tech" data-aos>
-          <div class="blog-card-img blog-img-tech">
-            <svg viewBox="0 0 80 80" width="44" height="44" fill="none">
-              <rect x="16" y="8" width="48" height="64" rx="8" stroke="#4FC3F7" stroke-width="1"/>
-              <circle cx="40" cy="36" r="12" stroke="#F97316" stroke-width="1.5" stroke-dasharray="3 2"/>
-              <circle cx="40" cy="36" r="6" stroke="#F97316" stroke-width="1"/>
-              <path d="M32 56l5 5 10-10" stroke="#4FC3F7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <div class="blog-card-body">
-            <div class="blog-meta">
-              <span class="blog-category">Technology</span>
-              <span class="blog-date">Coming Soon</span>
-            </div>
-            <h3>Secure Enclave vs Cloud Storage: Where Should Keys Live?</h3>
-            <p>A technical breakdown of why hardware-level key storage is fundamentally more secure than any cloud-based or software solution.</p>
-          </div>
-        </article>
-
-        <article class="blog-card" data-category="ecosystem" data-aos>
-          <div class="blog-card-img blog-img-eco">
-            <svg viewBox="0 0 80 80" width="44" height="44" fill="none">
-              <path d="M20 60l15-20 15 12 15-24" stroke="#4FC3F7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              <circle cx="20" cy="60" r="3" stroke="#F97316" stroke-width="1.5"/>
-              <circle cx="65" cy="28" r="3" stroke="#F97316" stroke-width="1.5"/>
-              <path d="M10 68h60" stroke="#4FC3F7" stroke-width="1" opacity="0.3"/>
-            </svg>
-          </div>
-          <div class="blog-card-body">
-            <div class="blog-meta">
-              <span class="blog-category">Ecosystem</span>
-              <span class="blog-date">Coming Soon</span>
-            </div>
-            <h3>Native PDAs vs EVM: Why Solana Wins for Biometrics</h3>
-            <p>You can't build a Visa competitor on 12-minute finality. Here's the engineering physics behind QOR's choice of Solana.</p>
-          </div>
-        </article>
-
-        <article class="blog-card" data-category="announcements" data-aos>
-          <div class="blog-card-img blog-img-announce">
-            <svg viewBox="0 0 80 80" width="44" height="44" fill="none">
-              <path d="M40 12l24 12v16c0 14-10 24-24 26-14-2-24-12-24-26V24l24-12z" stroke="#F97316" stroke-width="1.5"/>
-              <path d="M32 40l5 5 10-10" stroke="#4FC3F7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <div class="blog-card-body">
-            <div class="blog-meta">
-              <span class="blog-category">Announcements</span>
-              <span class="blog-date">Coming Soon</span>
-            </div>
-            <h3>12 Words Are Dead. Long Live the User.</h3>
-            <p>The era of 'Crypto' ends here. The era of Sovereign Digital Banking begins. An introduction to the QOR Core Ecosystem vision.</p>
-          </div>
-        </article>
+      <div class="blog-grid" id="blogGrid">
+        <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)">Loading articles...</div>
       </div>
     </div>
   </section>
@@ -332,5 +195,118 @@
   <script src="js/tracker.js"></script>
   <script src="js/script.js"></script>
   <script src="js/chatbot.js"></script>
+  <script>
+  (function() {
+    const catColors = {};
+    const defaultColors = { technology: '#4FC3F7', security: '#F97316', ecosystem: '#22c55e', announcements: '#a855f7' };
+    let allPosts = [];
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '';
+      return new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    function fixThumbUrl(url) {
+      if (!url) return '';
+      // Normalize: strip leading ../ if present (admin-relative), keep uploads/...
+      return url.replace(/^\.\.\//, '');
+    }
+
+    function renderFeatured(post) {
+      if (!post) return;
+      const section = document.getElementById('featured');
+      const card = document.getElementById('featuredCard');
+      const color = catColors[post.category] || defaultColors[post.category] || '#4FC3F7';
+      const thumb = fixThumbUrl(post.thumbnail);
+      const imgHtml = thumb
+        ? '<img src="' + thumb + '" alt="' + post.title + '" style="width:100%;height:100%;object-fit:cover">'
+        : '<div class="blog-feat-img-inner"><svg viewBox="0 0 120 120" width="80" height="80" fill="none"><circle cx="60" cy="44" r="20" stroke="' + color + '" stroke-width="1.5" stroke-dasharray="4 3"/><circle cx="60" cy="44" r="10" stroke="#F97316" stroke-width="1.5"/><circle cx="60" cy="44" r="3" fill="#F97316"/></svg></div>';
+
+      card.innerHTML = `
+        <a href="blog-post.html?slug=${encodeURIComponent(post.slug)}" style="display:flex;flex-direction:row;gap:0;text-decoration:none;color:inherit" class="blog-feat-link">
+          <div class="blog-feat-img">${imgHtml}<span class="blog-feat-badge">Featured</span></div>
+          <div class="blog-feat-body">
+            <div class="blog-meta">
+              <span class="blog-category" style="color:${color}">${post.category}</span>
+              <span class="blog-date">${formatDate(post.published_at)}</span>
+            </div>
+            <h2>${post.title}</h2>
+            <p>${post.excerpt || ''}</p>
+            <span class="blog-read-more">Read Article <svg viewBox="0 0 20 20" width="16" height="16" fill="none"><path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+        </a>`;
+      section.style.display = '';
+    }
+
+    function renderPosts(posts, filter) {
+      const grid = document.getElementById('blogGrid');
+      const filtered = filter && filter !== 'all' ? posts.filter(p => p.category === filter) : posts;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)">No articles found.</div>';
+        return;
+      }
+
+      grid.innerHTML = filtered.map(post => {
+        const color = catColors[post.category] || defaultColors[post.category] || '#4FC3F7';
+        const thumb = fixThumbUrl(post.thumbnail);
+        const imgHtml = thumb
+          ? '<img src="' + thumb + '" alt="" style="width:100%;height:100%;object-fit:cover">'
+          : '<svg viewBox="0 0 80 80" width="44" height="44" fill="none"><rect x="10" y="10" width="60" height="60" rx="8" stroke="' + color + '" stroke-width="1"/><path d="M25 50l10-15 10 10 15-20" stroke="#F97316" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+        return `<article class="blog-card" data-aos>
+          <a href="blog-post.html?slug=${encodeURIComponent(post.slug)}" style="text-decoration:none;color:inherit">
+            <div class="blog-card-img" style="background:${color}08">${imgHtml}</div>
+            <div class="blog-card-body">
+              <div class="blog-meta">
+                <span class="blog-category" style="color:${color}">${post.category}</span>
+                <span class="blog-date">${formatDate(post.published_at)}</span>
+              </div>
+              <h3>${post.title}</h3>
+              <p>${post.excerpt || ''}</p>
+            </div>
+          </a>
+        </article>`;
+      }).join('');
+    }
+
+    function renderFilters(categories) {
+      const container = document.getElementById('blogFilters');
+      container.innerHTML = '<button class="blog-filter active" data-filter="all">All</button>';
+      categories.forEach(cat => {
+        container.innerHTML += '<button class="blog-filter" data-filter="' + cat.slug + '">' + cat.name + '</button>';
+      });
+      container.querySelectorAll('.blog-filter').forEach(btn => {
+        btn.addEventListener('click', function() {
+          container.querySelectorAll('.blog-filter').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          renderPosts(allPosts, this.dataset.filter);
+        });
+      });
+    }
+
+    fetch('admin/api/posts.php?action=list&limit=50')
+      .then(r => r.json())
+      .then(data => {
+        if (!data.success) return;
+
+        // Build color map from categories
+        if (data.categories) {
+          data.categories.forEach(c => { catColors[c.slug] = c.color; });
+          renderFilters(data.categories);
+        }
+
+        // Featured
+        if (data.featured) renderFeatured(data.featured);
+
+        // Posts
+        allPosts = data.posts || [];
+        renderPosts(allPosts, 'all');
+      })
+      .catch(() => {
+        document.getElementById('blogGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)">Unable to load articles.</div>';
+      });
+  })();
+  </script>
 </body>
 </html>

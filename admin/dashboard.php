@@ -13,10 +13,11 @@ $stats = [
     'messages' => 0,
     'posts' => 0,
     'subscribers' => 0,
+    'media' => 0,
 ];
 
 // Try to get counts from tables (they may not exist yet)
-$tables = ['waitlist', 'contacts', 'posts', 'subscribers'];
+$tables = ['waitlist', 'contacts', 'posts', 'subscribers', 'media'];
 foreach ($tables as $table) {
     try {
         $stmt = $db->query("SELECT COUNT(*) FROM `{$table}`");
@@ -122,8 +123,12 @@ renderHeader('Dashboard', 'dashboard');
                     <span class="info-value"><?= date('Y-m-d H:i T') ?></span>
                 </div>
                 <div class="info-item">
+                    <span class="info-label">Media Files</span>
+                    <span class="info-value"><?= $stats['media'] ?></span>
+                </div>
+                <div class="info-item">
                     <span class="info-label">Active Phases</span>
-                    <span class="info-value badge-blue">Phase 1</span>
+                    <span class="info-value badge-blue">1–11</span>
                 </div>
             </div>
         </div>
