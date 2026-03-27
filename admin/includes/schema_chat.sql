@@ -12,8 +12,6 @@ CREATE TABLE IF NOT EXISTS chat_sessions (
     INDEX idx_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-ALTER TABLE chat_sessions ADD COLUMN IF NOT EXISTS rating TINYINT NULL AFTER status;
-
 CREATE TABLE IF NOT EXISTS chat_messages (
     id INT AUTO_INCREMENT PRIMARY KEY,
     session_id INT NOT NULL,

@@ -21,11 +21,6 @@ CREATE TABLE IF NOT EXISTS page_views (
     INDEX idx_device (device_type)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-ALTER TABLE page_views ADD COLUMN IF NOT EXISTS utm_source VARCHAR(100) NULL AFTER session_id;
-ALTER TABLE page_views ADD COLUMN IF NOT EXISTS utm_medium VARCHAR(100) NULL AFTER utm_source;
-ALTER TABLE page_views ADD COLUMN IF NOT EXISTS utm_campaign VARCHAR(100) NULL AFTER utm_medium;
-ALTER TABLE page_views ADD COLUMN IF NOT EXISTS duration INT NULL DEFAULT 0 AFTER utm_campaign;
-
 CREATE TABLE IF NOT EXISTS analytics_events (
     id INT AUTO_INCREMENT PRIMARY KEY,
     event_name VARCHAR(100) NOT NULL,

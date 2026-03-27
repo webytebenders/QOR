@@ -17,11 +17,6 @@ CREATE TABLE IF NOT EXISTS seo_pages (
     INDEX idx_page (page_file)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Add columns if upgrading from older schema
-ALTER TABLE seo_pages ADD COLUMN IF NOT EXISTS focus_keyword VARCHAR(100) NULL AFTER meta_description;
-ALTER TABLE seo_pages ADD COLUMN IF NOT EXISTS seo_score INT NOT NULL DEFAULT 0 AFTER focus_keyword;
-ALTER TABLE seo_pages ADD COLUMN IF NOT EXISTS structured_data TEXT NULL AFTER no_index;
-
 CREATE TABLE IF NOT EXISTS seo_redirects (
     id INT AUTO_INCREMENT PRIMARY KEY,
     source_url VARCHAR(500) NOT NULL,
