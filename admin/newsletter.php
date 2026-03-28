@@ -911,6 +911,9 @@ addCondition('status', 'equals', 'active');
                         <td>
                             <div class="table-actions">
                                 <a href="campaign-edit.php?id=<?= $c['id'] ?>" class="btn btn-secondary btn-sm">Edit</a>
+                                <?php if ($c['status'] === 'sent'): ?>
+                                <a href="campaign-stats.php?id=<?= $c['id'] ?>" class="btn btn-secondary btn-sm">Stats</a>
+                                <?php endif; ?>
                                 <?php if ($c['status'] !== 'sent'): ?>
                                 <form method="POST" action="api/email.php?action=send_campaign" style="display:inline" onsubmit="return confirm('Send this campaign?')">
                                     <?= csrfField() ?>
