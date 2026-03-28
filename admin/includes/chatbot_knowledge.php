@@ -35,12 +35,12 @@ function getHardcodedKnowledge(): array {
     return [
         [
             'keywords' => ['biometric', 'face', 'fingerprint', 'face id', 'touch id', 'scan'],
-            'response' => "Core Chain uses your device's biometric authentication (Face ID / Touch ID) as your wallet key. Your biometric data is processed entirely inside your phone's Secure Enclave chip — it never leaves your device, never touches the blockchain, and is never stored by Core Chain. One scan = full access to your sovereign wallet.",
+            'response' => "Core Chain uses your device's biometric authentication (Face ID / Touch ID / Fingerprint) as your wallet key. Your face or fingerprint is your key. Your biometric data is processed entirely inside your phone's Secure Enclave chip — it never leaves your device, never touches the blockchain, and is never stored by Core Chain. One scan = full access to your sovereign wallet.",
             'quick_replies' => ['How is my data kept private?', 'What if I lose my phone?']
         ],
         [
             'keywords' => ['seed phrase', 'seed', '12 words', 'recovery phrase', 'mnemonic'],
-            'response' => "Core Chain eliminates seed phrases entirely. Over \$200B in crypto has been permanently lost to forgotten seed phrases. With Core Chain, your face is your key — no 12 words to memorize, no paper backups to lose. Your private key lives in your device's Secure Enclave hardware chip.",
+            'response' => "Core Chain eliminates seed phrases entirely. Over \$200B in crypto has been permanently lost to forgotten seed phrases. With Core Chain, your face or fingerprint is your key — no 12 words to memorize, no paper backups to lose. Your private key lives in your device's Secure Enclave hardware chip.",
             'quick_replies' => ['How does biometric auth work?', 'What about device recovery?']
         ],
         [
