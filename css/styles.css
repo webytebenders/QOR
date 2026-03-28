@@ -125,6 +125,26 @@ img {
   white-space: nowrap;
 }
 
+.nav-whitepaper {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #4FC3F7;
+  text-decoration: none;
+  white-space: nowrap;
+  padding: 6px 14px;
+  border: 1px solid rgba(79, 195, 247, 0.4);
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  margin-left: 4px;
+}
+
+.nav-whitepaper:hover {
+  background: rgba(79, 195, 247, 0.1);
+  border-color: #4FC3F7;
+  color: #fff;
+}
+
 .nav-links {
   display: flex;
   align-items: center;
@@ -1480,7 +1500,8 @@ img {
   }
 
   .nav-links,
-  .nav-cta:not(.mobile-cta) {
+  .nav-cta:not(.mobile-cta),
+  .nav-whitepaper {
     display: none;
   }
 
@@ -1623,11 +1644,11 @@ img {
 /* About Hero */
 .about-hero {
   position: relative;
-  min-height: 70vh;
+  min-height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 160px 0 100px;
+  padding: 120px 0 60px;
   overflow: hidden;
   text-align: center;
 }
@@ -2075,7 +2096,7 @@ img {
 @media (max-width: 768px) {
   .about-hero {
     min-height: auto;
-    padding: 120px 24px 60px;
+    padding: 100px 24px 40px;
   }
 
   .moats-grid {
