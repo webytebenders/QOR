@@ -301,19 +301,53 @@ if ($action === 'send_campaign' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $emailContent = blocksToEmailHtml($decoded);
     }
 
+    $trackBase = rtrim(APP_URL, '/') . '/admin/api/track.php';
     $template = getEmailWrapper($emailContent, '{{unsubscribe_url}}');
-    $mailer = new Mailer();
-    $results = $mailer->sendBulk($subscribers, $campaign['subject'], $template);
 
+    $mailer = new Mailer();
     $stmtLog = $db->prepare('INSERT INTO campaign_logs (campaign_id, subscriber_id, status, sent_at) VALUES (?, ?, ?, NOW())');
-    foreach ($subscribers as $sub) { $stmtLog->execute([$campaignId, $sub['id'], 'sent']); }
+
+    $sent = 0;
+    $failed = 0;
+
+    foreach ($subscribers as $sub) {
+        // Personalize per subscriber
+        $personalHtml = $template;
+        $unsubUrl = rtrim(APP_URL, '/') . '/admin/api/newsletter.php?action=unsubscribe&token=' . $sub['unsubscribe_token'];
+        $personalHtml = str_replace('{{unsubscribe_url}}', $unsubUrl, $personalHtml);
+        $personalHtml = str_replace('{{email}}', $sub['email'], $personalHtml);
+
+        // Inject open tracking pixel before </body> or at the end
+        $trackPixel = '<img src="' . $trackBase . '?action=open&cid=' . $campaignId . '&sid=' . $sub['id'] . '" width="1" height="1" style="display:none;" alt="">';
+        if (stripos($personalHtml, '</body>') !== false) {
+            $personalHtml = str_ireplace('</body>', $trackPixel . '</body>', $personalHtml);
+        } else {
+            $personalHtml .= $trackPixel;
+        }
+
+        // Wrap all links for click tracking (except unsubscribe link)
+        $personalHtml = preg_replace_callback('/href="(https?:\/\/[^"]+)"/', function($m) use ($trackBase, $campaignId, $sub, $unsubUrl) {
+            $origUrl = $m[1];
+            // Don't wrap unsubscribe links
+            if (strpos($origUrl, 'unsubscribe') !== false) return $m[0];
+            $trackUrl = $trackBase . '?action=click&cid=' . $campaignId . '&sid=' . $sub['id'] . '&url=' . urlencode($origUrl);
+            return 'href="' . $trackUrl . '"';
+        }, $personalHtml);
+
+        // Send
+        $result = $mailer->send($sub['email'], $campaign['subject'], $personalHtml);
+        if ($result) { $sent++; } else { $failed++; }
+
+        // Log
+        $stmtLog->execute([$campaignId, $sub['id'], 'sent']);
+    }
 
     $stmt = $db->prepare('UPDATE campaigns SET status = ?, sent_at = NOW(), sent_count = ? WHERE id = ?');
-    $stmt->execute(['sent', $results['sent'], $campaignId]);
+    $stmt->execute(['sent', $sent, $campaignId]);
 
-    logActivity($_SESSION['admin_id'], 'send_campaign', 'campaign', $campaignId, ['sent' => $results['sent'], 'failed' => $results['failed']]);
+    logActivity($_SESSION['admin_id'], 'send_campaign', 'campaign', $campaignId, ['sent' => $sent, 'failed' => $failed]);
 
-    $msg = $results['failed'] > 0 ? "Sent to {$results['sent']}. {$results['failed']} failed." : "Sent to {$results['sent']} subscribers!";
+    $msg = $failed > 0 ? "Sent to {$sent}. {$failed} failed." : "Sent to {$sent} subscribers!";
     setFlash('success', $msg);
     redirect('../newsletter.php?tab=campaigns');
 }
