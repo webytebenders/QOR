@@ -158,6 +158,15 @@ if (!empty($subscribers)) {
 $totalActive = $db->query("SELECT COUNT(*) FROM subscribers WHERE status = 'active'")->fetchColumn();
 $totalUnsub = $db->query("SELECT COUNT(*) FROM subscribers WHERE status = 'unsubscribed'")->fetchColumn();
 $thisWeekSubs = $db->query("SELECT COUNT(*) FROM subscribers WHERE subscribed_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) AND status = 'active'")->fetchColumn();
+$totalUnsub = $db->query("SELECT COUNT(*) FROM subscribers WHERE status = 'unsubscribed'")->fetchColumn();
+
+// List health
+$inactiveCount = 0;
+try { $inactiveCount = $db->query("SELECT COUNT(*) FROM subscribers WHERE status = 'active' AND (last_opened_at IS NULL AND subscribed_at < DATE_SUB(NOW(), INTERVAL 90 DAY)) OR (last_opened_at IS NOT NULL AND last_opened_at < DATE_SUB(NOW(), INTERVAL 90 DAY))")->fetchColumn(); } catch (Exception $e) {}
+$unsubReasons = [];
+try { $unsubReasons = $db->query("SELECT unsubscribe_reason, COUNT(*) as cnt FROM subscribers WHERE status = 'unsubscribed' AND unsubscribe_reason IS NOT NULL AND unsubscribe_reason != '' GROUP BY unsubscribe_reason ORDER BY cnt DESC LIMIT 5")->fetchAll(); } catch (Exception $e) {}
+$freqBreakdown = [];
+try { $freqBreakdown = $db->query("SELECT frequency, COUNT(*) as cnt FROM subscribers WHERE status = 'active' GROUP BY frequency ORDER BY cnt DESC")->fetchAll(); } catch (Exception $e) {}
 
 // All tags (for dropdown + tags tab)
 $allTags = $db->query('SELECT t.*, (SELECT COUNT(*) FROM subscriber_tags WHERE tag_id = t.id) as sub_count FROM tags t ORDER BY t.name')->fetchAll();
@@ -228,6 +237,7 @@ renderHeader('Newsletter', 'newsletter');
     <a href="newsletter.php?tab=tags" class="tab <?= $tab === 'tags' ? 'tab-active' : '' ?>">Tags</a>
     <a href="newsletter.php?tab=segments" class="tab <?= $tab === 'segments' ? 'tab-active' : '' ?>">Segments</a>
     <a href="newsletter.php?tab=campaigns" class="tab <?= $tab === 'campaigns' ? 'tab-active' : '' ?>">Campaigns</a>
+    <a href="newsletter.php?tab=health" class="tab <?= $tab === 'health' ? 'tab-active' : '' ?>">List Health</a>
 </div>
 
 <?php if ($tab === 'subscribers'): ?>
@@ -948,6 +958,138 @@ addCondition('status', 'equals', 'active');
         </div>
     </div>
 </div>
+<?php elseif ($tab === 'health'): ?>
+<!-- ==================== LIST HEALTH ==================== -->
+<?php
+$healthScore = 100;
+$totalAll = $totalActive + $totalUnsub;
+$unsubPct = $totalAll > 0 ? round(($totalUnsub / $totalAll) * 100, 1) : 0;
+$inactivePct = $totalActive > 0 ? round(($inactiveCount / $totalActive) * 100, 1) : 0;
+if ($unsubPct > 20) $healthScore -= 30; elseif ($unsubPct > 10) $healthScore -= 15;
+if ($inactivePct > 40) $healthScore -= 30; elseif ($inactivePct > 20) $healthScore -= 15;
+if ($totalActive < 10) $healthScore -= 20;
+$healthScore = max(0, $healthScore);
+$healthColor = $healthScore >= 70 ? 'var(--green)' : ($healthScore >= 40 ? 'var(--orange)' : 'var(--red)');
+?>
+
+<div class="stats-row" style="margin-bottom:0;">
+    <div class="stat-widget">
+        <div class="stat-widget-icon <?= $healthScore >= 70 ? 'green' : ($healthScore >= 40 ? 'orange' : 'red') ?>">
+            <svg viewBox="0 0 20 20" fill="currentColor" width="22" height="22"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/></svg>
+        </div>
+        <div class="stat-widget-data">
+            <span class="stat-widget-value" style="color:<?= $healthColor ?>;"><?= $healthScore ?>%</span>
+            <span class="stat-widget-label">Health Score</span>
+        </div>
+    </div>
+    <div class="stat-widget">
+        <div class="stat-widget-icon orange">
+            <svg viewBox="0 0 20 20" fill="currentColor" width="22" height="22"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>
+        </div>
+        <div class="stat-widget-data">
+            <span class="stat-widget-value"><?= number_format($inactiveCount) ?></span>
+            <span class="stat-widget-label">Inactive (90d)</span>
+        </div>
+    </div>
+    <div class="stat-widget">
+        <div class="stat-widget-icon red">
+            <svg viewBox="0 0 20 20" fill="currentColor" width="22" height="22"><path fill-rule="evenodd" d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z" clip-rule="evenodd"/></svg>
+        </div>
+        <div class="stat-widget-data">
+            <span class="stat-widget-value"><?= $unsubPct ?>%</span>
+            <span class="stat-widget-label">Unsub Rate</span>
+        </div>
+    </div>
+    <div class="stat-widget">
+        <div class="stat-widget-icon blue">
+            <svg viewBox="0 0 20 20" fill="currentColor" width="22" height="22"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>
+        </div>
+        <div class="stat-widget-data">
+            <span class="stat-widget-value"><?= number_format($totalAll) ?></span>
+            <span class="stat-widget-label">Total All Time</span>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-grid" style="margin-top:20px;">
+    <!-- Frequency Breakdown -->
+    <div class="card">
+        <div class="card-header"><h2>Frequency Preferences</h2></div>
+        <div class="card-body">
+            <?php if (empty($freqBreakdown)): ?>
+            <p class="empty-state">No preference data yet.</p>
+            <?php else: ?>
+            <?php $maxFreq = max(array_column($freqBreakdown, 'cnt')) ?: 1;
+            $freqLabels = ['all' => 'All Emails', 'weekly' => 'Weekly Digest', 'monthly' => 'Monthly Digest', 'important' => 'Important Only'];
+            foreach ($freqBreakdown as $fb): $pct = round(($fb['cnt'] / $maxFreq) * 100); ?>
+            <div style="margin-bottom:12px;">
+                <div style="display:flex;justify-content:space-between;font-size:0.85rem;margin-bottom:4px;">
+                    <span><?= $freqLabels[$fb['frequency']] ?? $fb['frequency'] ?></span>
+                    <strong><?= number_format($fb['cnt']) ?></strong>
+                </div>
+                <div style="width:100%;height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
+                    <div style="width:<?= $pct ?>%;height:100%;background:var(--blue);border-radius:3px;"></div>
+                </div>
+            </div>
+            <?php endforeach; endif; ?>
+        </div>
+    </div>
+
+    <!-- Unsubscribe Reasons -->
+    <div class="card">
+        <div class="card-header"><h2>Unsubscribe Reasons</h2></div>
+        <div class="card-body">
+            <?php if (empty($unsubReasons)): ?>
+            <p class="empty-state">No unsubscribe reason data yet.</p>
+            <?php else: ?>
+            <?php $maxR = max(array_column($unsubReasons, 'cnt')) ?: 1;
+            $reasonLabels = ['too_many' => 'Too many emails', 'not_relevant' => 'Not relevant', 'never_signed_up' => 'Never signed up', 'other' => 'Other'];
+            foreach ($unsubReasons as $ur): $pct = round(($ur['cnt'] / $maxR) * 100); ?>
+            <div style="margin-bottom:12px;">
+                <div style="display:flex;justify-content:space-between;font-size:0.85rem;margin-bottom:4px;">
+                    <span><?= $reasonLabels[$ur['unsubscribe_reason']] ?? sanitize($ur['unsubscribe_reason']) ?></span>
+                    <strong><?= number_format($ur['cnt']) ?></strong>
+                </div>
+                <div style="width:100%;height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
+                    <div style="width:<?= $pct ?>%;height:100%;background:var(--red);border-radius:3px;"></div>
+                </div>
+            </div>
+            <?php endforeach; endif; ?>
+        </div>
+    </div>
+</div>
+
+<!-- Recommendations -->
+<div class="card" style="margin-top:20px;">
+    <div class="card-header"><h2>Recommendations</h2></div>
+    <div class="card-body">
+        <div style="display:flex;flex-direction:column;gap:12px;font-size:0.85rem;">
+            <?php if ($inactivePct > 20): ?>
+            <div style="display:flex;align-items:start;gap:8px;">
+                <span style="color:var(--orange);font-size:1.2rem;">&#9888;</span>
+                <div><strong><?= $inactivePct ?>% of subscribers are inactive</strong> (no opens in 90 days). Consider running a re-engagement campaign or cleaning your list.</div>
+            </div>
+            <?php endif; ?>
+            <?php if ($unsubPct > 10): ?>
+            <div style="display:flex;align-items:start;gap:8px;">
+                <span style="color:var(--red);font-size:1.2rem;">&#9888;</span>
+                <div><strong>Unsubscribe rate is <?= $unsubPct ?>%</strong>. Review your email frequency and content relevance.</div>
+            </div>
+            <?php endif; ?>
+            <?php if ($healthScore >= 70): ?>
+            <div style="display:flex;align-items:start;gap:8px;">
+                <span style="color:var(--green);font-size:1.2rem;">&#10003;</span>
+                <div><strong>Your list looks healthy!</strong> Keep sending valuable content and monitoring engagement.</div>
+            </div>
+            <?php endif; ?>
+            <div style="display:flex;align-items:start;gap:8px;">
+                <span style="color:var(--blue);font-size:1.2rem;">&#9432;</span>
+                <div>Preference center link is included in all emails. Subscribers can manage their frequency and topics at: <code style="font-size:0.8rem;"><?= APP_URL ?>/admin/api/preferences.php?token=...</code></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?php endif; ?>
 
 <?php

@@ -230,7 +230,9 @@ function getTemplateSubject(string $slug, array $vars = []): string {
 // ===== EMAIL TEMPLATES =====
 
 function getEmailWrapper(string $content, string $unsubscribeUrl = ''): string {
-    $unsub = $unsubscribeUrl ? '<p style="margin-top:30px;padding-top:20px;border-top:1px solid #222;font-size:12px;color:#666;"><a href="' . $unsubscribeUrl . '" style="color:#4FC3F7;">Unsubscribe</a> from these emails.</p>' : '';
+    // Build preference link from unsubscribe URL (swap endpoint)
+    $prefsUrl = str_replace('newsletter.php?action=unsubscribe&token=', 'preferences.php?token=', $unsubscribeUrl);
+    $unsub = $unsubscribeUrl ? '<p style="margin-top:30px;padding-top:20px;border-top:1px solid #222;font-size:12px;color:#666;"><a href="' . $prefsUrl . '" style="color:#4FC3F7;">Manage Preferences</a> &middot; <a href="' . $unsubscribeUrl . '" style="color:#666;">Unsubscribe</a></p>' : '';
 
     return '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
 <body style="margin:0;padding:0;background:#0a0a0f;font-family:Inter,-apple-system,sans-serif;">
