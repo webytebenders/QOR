@@ -879,7 +879,8 @@ addCondition('status', 'equals', 'active');
 
 <?php elseif ($tab === 'campaigns'): ?>
 <!-- ==================== CAMPAIGNS ==================== -->
-<div class="page-actions">
+<div class="page-actions" style="gap:8px;">
+    <a href="campaign-templates.php" class="btn btn-secondary">Templates</a>
     <a href="campaign-edit.php" class="btn btn-primary">
         <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
         New Campaign

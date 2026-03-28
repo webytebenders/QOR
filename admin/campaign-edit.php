@@ -214,6 +214,21 @@ renderHeader($pageTitle, 'newsletter');
                     </div>
                     <button type="submit" class="btn btn-primary btn-full" onclick="syncContent()"><?= $campaign ? 'Update' : 'Save' ?> Campaign</button>
 
+                    <?php if ($campaign && $campaign['status'] !== 'sent'): ?>
+                    <a href="ab-test.php?campaign_id=<?= $campaign['id'] ?>" class="btn btn-secondary btn-full" style="margin-top:8px;">A/B Test Subject</a>
+                    <?php endif; ?>
+
+                    <?php if ($campaign): ?>
+                    <form method="POST" action="campaign-templates.php?action=save_as_template" style="margin-top:8px;">
+                        <?= csrfField() ?>
+                        <input type="hidden" name="name" value="<?= sanitize($campaign['subject']) ?>">
+                        <input type="hidden" name="subject" value="<?= sanitize($campaign['subject']) ?>">
+                        <input type="hidden" name="content" value="<?= htmlspecialchars($campaign['content']) ?>">
+                        <input type="hidden" name="category" value="Custom">
+                        <button type="submit" class="btn btn-ghost btn-full" onclick="syncContent();this.form.querySelector('[name=content]').value=document.getElementById('contentHidden').value;">Save as Template</button>
+                    </form>
+                    <?php endif; ?>
+
                     <?php if ($campaign && ($campaign['sent_at'] ?? null)): ?>
                     <div class="editor-meta" style="margin-top:12px;">
                         <span>Sent: <?= date('M j g:i A', strtotime($campaign['sent_at'])) ?></span>
