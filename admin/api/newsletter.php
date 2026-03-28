@@ -100,15 +100,27 @@ if ($action === 'export') {
     $where = $status ? 'WHERE status = ?' : '';
     $params = $status ? [$status] : [];
 
-    $stmt = $db->prepare("SELECT email, status, source, subscribed_at, unsubscribed_at FROM subscribers {$where} ORDER BY subscribed_at DESC");
+    $stmt = $db->prepare("SELECT id, email, name, status, source, subscribed_at, unsubscribed_at FROM subscribers {$where} ORDER BY subscribed_at DESC");
     $stmt->execute($params);
     $rows = $stmt->fetchAll();
+
+    // Get tags for all subscribers
+    $tagMap = [];
+    try {
+        $tagRows = $db->query('SELECT st.subscriber_id, t.name FROM subscriber_tags st JOIN tags t ON st.tag_id = t.id')->fetchAll();
+        foreach ($tagRows as $tr) {
+            $tagMap[$tr['subscriber_id']][] = $tr['name'];
+        }
+    } catch (Exception $e) {}
 
     header('Content-Type: text/csv');
     header('Content-Disposition: attachment; filename="subscribers_' . date('Y-m-d') . '.csv"');
     $out = fopen('php://output', 'w');
-    fputcsv($out, ['Email', 'Status', 'Source', 'Subscribed', 'Unsubscribed']);
-    foreach ($rows as $r) { fputcsv($out, [$r['email'], $r['status'], $r['source'], $r['subscribed_at'], $r['unsubscribed_at']]); }
+    fputcsv($out, ['Email', 'Name', 'Status', 'Source', 'Tags', 'Subscribed', 'Unsubscribed']);
+    foreach ($rows as $r) {
+        $tags = isset($tagMap[$r['id']]) ? implode(', ', $tagMap[$r['id']]) : '';
+        fputcsv($out, [$r['email'], $r['name'] ?? '', $r['status'], $r['source'], $tags, $r['subscribed_at'], $r['unsubscribed_at']]);
+    }
     fclose($out);
 
     require_once '../includes/logger.php';
@@ -238,6 +250,62 @@ if ($action === 'send_campaign' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     require_once '../includes/auth.php';
     startSecureSession(); requireRole('super_admin');
     redirect('../newsletter.php?tab=campaigns');
+}
+
+// ===== ADMIN: Import CSV =====
+if ($action === 'import_csv' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_once '../includes/auth.php';
+    require_once '../includes/logger.php';
+    startSecureSession(); requireRole('super_admin', 'editor');
+
+    $input = json_decode(file_get_contents('php://input'), true);
+    if (!validateCSRF($input['csrf_token'] ?? '')) { jsonResponse(['success' => false, 'error' => 'Invalid CSRF.'], 403); }
+
+    $rows = $input['rows'] ?? [];
+    $tagId = $input['tag_id'] ?? null;
+    $dupMode = $input['duplicate_mode'] ?? 'skip';
+
+    if (empty($rows)) { jsonResponse(['success' => false, 'error' => 'No rows to import.'], 400); }
+
+    $db = getDB();
+    $imported = 0;
+    $skipped = 0;
+    $updated = 0;
+
+    $checkStmt = $db->prepare('SELECT id FROM subscribers WHERE email = ?');
+    $insertStmt = $db->prepare('INSERT INTO subscribers (email, name, source, unsubscribe_token, ip_address, subscribed_at) VALUES (?, ?, ?, ?, ?, NOW())');
+    $updateStmt = $db->prepare('UPDATE subscribers SET name = COALESCE(NULLIF(?, ""), name), source = COALESCE(NULLIF(?, ""), source) WHERE email = ?');
+    $tagStmt = $tagId ? $db->prepare('INSERT IGNORE INTO subscriber_tags (subscriber_id, tag_id) VALUES (?, ?)') : null;
+
+    foreach ($rows as $row) {
+        $email = filter_var(trim($row['email'] ?? ''), FILTER_VALIDATE_EMAIL);
+        if (!$email) { $skipped++; continue; }
+
+        $name = sanitize($row['name'] ?? '');
+        $source = sanitize($row['source'] ?? 'csv_import');
+
+        $checkStmt->execute([$email]);
+        $existing = $checkStmt->fetch();
+
+        if ($existing) {
+            if ($dupMode === 'update') {
+                $updateStmt->execute([$name, $source, $email]);
+                $updated++;
+                if ($tagStmt) { $tagStmt->execute([$existing['id'], $tagId]); }
+            } else {
+                $skipped++;
+            }
+        } else {
+            $token = bin2hex(random_bytes(32));
+            $insertStmt->execute([$email, $name ?: null, $source, $token, $_SERVER['REMOTE_ADDR'] ?? '']);
+            $newId = $db->lastInsertId();
+            $imported++;
+            if ($tagStmt) { $tagStmt->execute([$newId, $tagId]); }
+        }
+    }
+
+    logActivity($_SESSION['admin_id'], 'import_csv', 'subscriber', null, ['imported' => $imported, 'skipped' => $skipped, 'updated' => $updated]);
+    jsonResponse(['success' => true, 'imported' => $imported, 'skipped' => $skipped, 'updated' => $updated]);
 }
 
 // ===== ADMIN: Bulk Tag =====

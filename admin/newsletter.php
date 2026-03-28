@@ -219,6 +219,7 @@ renderHeader('Newsletter', 'newsletter');
 <!-- Tabs -->
 <div class="tabs">
     <a href="newsletter.php?tab=subscribers" class="tab <?= $tab === 'subscribers' ? 'tab-active' : '' ?>">Subscribers</a>
+    <a href="newsletter.php?tab=import" class="tab <?= $tab === 'import' ? 'tab-active' : '' ?>">Import</a>
     <a href="newsletter.php?tab=tags" class="tab <?= $tab === 'tags' ? 'tab-active' : '' ?>">Tags</a>
     <a href="newsletter.php?tab=segments" class="tab <?= $tab === 'segments' ? 'tab-active' : '' ?>">Segments</a>
     <a href="newsletter.php?tab=campaigns" class="tab <?= $tab === 'campaigns' ? 'tab-active' : '' ?>">Campaigns</a>
@@ -383,6 +384,207 @@ function bulkTag(mode) {
         result.textContent = d.success ? d.message : (d.error || 'Failed');
         result.style.color = d.success ? 'var(--green)' : 'var(--red)';
         if (d.success) setTimeout(() => location.reload(), 800);
+    });
+}
+</script>
+
+<?php elseif ($tab === 'import'): ?>
+<!-- ==================== CSV IMPORT ==================== -->
+<div class="card" style="margin-bottom:20px;">
+    <div class="card-header"><h2>Import Subscribers from CSV</h2></div>
+    <div class="card-body">
+        <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:16px;">Upload a CSV file with subscriber emails. The first row should be column headers. Supported columns: <code>email</code>, <code>name</code>, <code>source</code>.</p>
+
+        <form id="csvUploadForm" style="margin-bottom:20px;">
+            <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
+                <div class="form-group" style="flex:1;min-width:200px;margin:0;">
+                    <label>CSV File</label>
+                    <input type="file" id="csvFile" accept=".csv,.txt" required>
+                </div>
+                <button type="submit" class="btn btn-secondary">Preview</button>
+            </div>
+        </form>
+
+        <!-- Preview area (populated by JS) -->
+        <div id="csvPreview" style="display:none;">
+            <div style="border-top:1px solid var(--border);padding-top:20px;">
+                <h3 style="font-size:0.9rem;font-weight:600;margin-bottom:16px;">Preview — <span id="csvRowCount">0</span> rows detected</h3>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;">
+                    <div class="form-group" style="margin:0;">
+                        <label>Email Column</label>
+                        <select id="mapEmail" class="filter-select"></select>
+                    </div>
+                    <div class="form-group" style="margin:0;">
+                        <label>Name Column (optional)</label>
+                        <select id="mapName" class="filter-select"><option value="">— None —</option></select>
+                    </div>
+                    <div class="form-group" style="margin:0;">
+                        <label>Source Column (optional)</label>
+                        <select id="mapSource" class="filter-select"><option value="">— None —</option></select>
+                    </div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+                    <div class="form-group" style="margin:0;">
+                        <label>Auto-assign Tag</label>
+                        <select id="importTagId">
+                            <option value="">— No tag —</option>
+                            <?php foreach ($allTags as $t): ?>
+                            <option value="<?= $t['id'] ?>"><?= sanitize($t['name']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin:0;">
+                        <label>Duplicate Handling</label>
+                        <select id="dupMode">
+                            <option value="skip">Skip existing emails</option>
+                            <option value="update">Update name/source if exists</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Sample rows -->
+                <div class="card" style="margin-bottom:16px;">
+                    <div class="card-body no-pad">
+                        <div class="table-wrap">
+                            <table class="data-table" id="csvSampleTable">
+                                <thead><tr></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display:flex;gap:12px;align-items:center;">
+                    <button class="btn btn-primary" onclick="runImport()">Import <span id="csvImportCount">0</span> Subscribers</button>
+                    <span id="importResult" style="font-size:0.85rem;"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Import from Waitlist -->
+<div class="card">
+    <div class="card-header"><h2>Other Import Sources</h2></div>
+    <div class="card-body">
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <form method="POST" action="api/newsletter.php?action=import_waitlist" style="display:inline" onsubmit="return confirm('Import all waitlist members not yet subscribed?')">
+                <?= csrfField() ?>
+                <button type="submit" class="btn btn-secondary">Import from Waitlist</button>
+            </form>
+        </div>
+        <p style="font-size:0.8rem;color:var(--text-muted);margin-top:8px;">Imports waitlist emails that aren't already newsletter subscribers.</p>
+    </div>
+</div>
+
+<script>
+let csvData = [];
+let csvHeaders = [];
+
+document.getElementById('csvUploadForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const file = document.getElementById('csvFile').files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const text = e.target.result;
+        const lines = text.split(/\r?\n/).filter(l => l.trim());
+        if (lines.length < 2) { alert('CSV must have a header row and at least one data row.'); return; }
+
+        csvHeaders = parseCSVLine(lines[0]);
+        csvData = lines.slice(1).map(l => parseCSVLine(l)).filter(r => r.length === csvHeaders.length);
+
+        // Populate column mapping dropdowns
+        ['mapEmail', 'mapName', 'mapSource'].forEach(id => {
+            const sel = document.getElementById(id);
+            const keepFirst = id !== 'mapEmail';
+            sel.innerHTML = keepFirst ? '<option value="">— None —</option>' : '';
+            csvHeaders.forEach((h, i) => {
+                const opt = document.createElement('option');
+                opt.value = i;
+                opt.textContent = h;
+                // Auto-detect
+                const hl = h.toLowerCase().trim();
+                if (id === 'mapEmail' && (hl === 'email' || hl === 'e-mail' || hl === 'email address')) opt.selected = true;
+                if (id === 'mapName' && (hl === 'name' || hl === 'full name' || hl === 'first name')) opt.selected = true;
+                if (id === 'mapSource' && (hl === 'source' || hl === 'origin')) opt.selected = true;
+                sel.appendChild(opt);
+            });
+        });
+
+        // Show sample rows
+        const thead = document.querySelector('#csvSampleTable thead tr');
+        thead.innerHTML = csvHeaders.map(h => '<th>' + h + '</th>').join('');
+        const tbody = document.querySelector('#csvSampleTable tbody');
+        tbody.innerHTML = csvData.slice(0, 5).map(row =>
+            '<tr>' + row.map(cell => '<td style="font-size:0.8rem;">' + escHtml(cell) + '</td>').join('') + '</tr>'
+        ).join('');
+        if (csvData.length > 5) {
+            tbody.innerHTML += '<tr><td colspan="' + csvHeaders.length + '" style="color:var(--text-muted);font-size:0.8rem;text-align:center;">...and ' + (csvData.length - 5) + ' more rows</td></tr>';
+        }
+
+        document.getElementById('csvRowCount').textContent = csvData.length;
+        document.getElementById('csvImportCount').textContent = csvData.length;
+        document.getElementById('csvPreview').style.display = 'block';
+    };
+    reader.readAsText(file);
+});
+
+function parseCSVLine(line) {
+    const result = [];
+    let current = '';
+    let inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (ch === '"') { inQuotes = !inQuotes; }
+        else if (ch === ',' && !inQuotes) { result.push(current.trim()); current = ''; }
+        else { current += ch; }
+    }
+    result.push(current.trim());
+    return result;
+}
+
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function runImport() {
+    const emailCol = parseInt(document.getElementById('mapEmail').value);
+    const nameCol = document.getElementById('mapName').value;
+    const sourceCol = document.getElementById('mapSource').value;
+    const tagId = document.getElementById('importTagId').value;
+    const dupMode = document.getElementById('dupMode').value;
+
+    if (isNaN(emailCol)) { alert('Select the email column.'); return; }
+
+    const rows = csvData.map(row => ({
+        email: row[emailCol] || '',
+        name: nameCol !== '' ? (row[parseInt(nameCol)] || '') : '',
+        source: sourceCol !== '' ? (row[parseInt(sourceCol)] || '') : 'csv_import',
+    })).filter(r => r.email && r.email.includes('@'));
+
+    if (!rows.length) { alert('No valid emails found.'); return; }
+
+    const result = document.getElementById('importResult');
+    result.textContent = 'Importing ' + rows.length + ' rows...';
+    result.style.color = 'var(--text-muted)';
+
+    fetch('api/newsletter.php?action=import_csv', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            rows: rows,
+            tag_id: tagId ? parseInt(tagId) : null,
+            duplicate_mode: dupMode,
+            csrf_token: '<?= generateCSRFToken() ?>'
+        })
+    }).then(r => r.json()).then(d => {
+        if (d.success) {
+            result.innerHTML = '<span style="color:var(--green);">Done! ' + d.imported + ' imported, ' + d.skipped + ' skipped, ' + d.updated + ' updated.</span>';
+        } else {
+            result.innerHTML = '<span style="color:var(--red);">' + (d.error || 'Import failed.') + '</span>';
+        }
     });
 }
 </script>
