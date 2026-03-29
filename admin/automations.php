@@ -57,7 +57,7 @@ if (isPost() && ($_GET['action'] ?? '') === 'save_automation') {
             setFlash('success', 'Automation saved.');
         }
     }
-    redirect('automations.php?view=edit&id=' . $id);
+    redirect('automations?view=edit&id=' . $id);
 }
 
 if (($_GET['action'] ?? '') === 'toggle') {
@@ -71,7 +71,7 @@ if (($_GET['action'] ?? '') === 'toggle') {
         logActivity($_SESSION['admin_id'], 'toggle_automation', 'newsletter', $id, ['status' => $newStatus]);
         setFlash('success', 'Automation ' . ($newStatus === 'active' ? 'activated' : 'paused') . '.');
     }
-    redirect('automations.php');
+    redirect('automations');
 }
 
 if (($_GET['action'] ?? '') === 'delete') {
@@ -81,7 +81,7 @@ if (($_GET['action'] ?? '') === 'delete') {
         logActivity($_SESSION['admin_id'], 'delete_automation', 'newsletter', $id);
         setFlash('success', 'Automation deleted.');
     }
-    redirect('automations.php');
+    redirect('automations');
 }
 
 // ===== DATA =====
@@ -120,7 +120,7 @@ renderHeader('Automations', 'automations');
 ?>
 
 <div class="msg-back">
-    <a href="newsletter.php?tab=campaigns" class="btn btn-ghost btn-sm">
+    <a href="newsletter?tab=campaigns" class="btn btn-ghost btn-sm">
         <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/></svg>
         Back to Newsletter
     </a>
@@ -128,7 +128,7 @@ renderHeader('Automations', 'automations');
 
 <?php if ($view === 'edit' || $view === 'new'): ?>
 <!-- ==================== EDIT/CREATE AUTOMATION ==================== -->
-<form method="POST" action="automations.php?action=save_automation">
+<form method="POST" action="automations?action=save_automation">
     <?= csrfField() ?>
     <?php if ($editAuto): ?><input type="hidden" name="id" value="<?= $editAuto['id'] ?>"><?php endif; ?>
 
@@ -236,7 +236,7 @@ renderHeader('Automations', 'automations');
 
     <div style="display:flex;gap:12px;">
         <button type="submit" class="btn btn-primary"><?= $editAuto ? 'Update' : 'Create' ?> Automation</button>
-        <a href="automations.php" class="btn btn-ghost">Cancel</a>
+        <a href="automations" class="btn btn-ghost">Cancel</a>
     </div>
 </form>
 
@@ -313,7 +313,7 @@ updateTriggerValue();
 <?php else: ?>
 <!-- ==================== AUTOMATIONS LIST ==================== -->
 <div class="page-actions">
-    <a href="automations.php?view=new" class="btn btn-primary">
+    <a href="automations?view=new" class="btn btn-primary">
         <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
         New Automation
     </a>
@@ -324,7 +324,7 @@ updateTriggerValue();
     <div style="text-align:center;padding:40px 20px;">
         <p style="font-size:1rem;margin-bottom:8px;">No automations yet</p>
         <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:20px;">Create automated email sequences that trigger when subscribers sign up, get tagged, or on a specific date.</p>
-        <a href="automations.php?view=new" class="btn btn-primary">Create Your First Automation</a>
+        <a href="automations?view=new" class="btn btn-primary">Create Your First Automation</a>
     </div>
 </div></div>
 <?php else: ?>
@@ -362,9 +362,9 @@ updateTriggerValue();
                             <?php endif; ?>
                         </td>
                         <td style="white-space:nowrap;">
-                            <a href="automations.php?view=edit&id=<?= $a['id'] ?>" class="btn btn-secondary btn-sm">Edit</a>
-                            <a href="automations.php?action=toggle&id=<?= $a['id'] ?>" class="btn btn-<?= $a['status'] === 'active' ? 'secondary' : 'primary' ?> btn-sm"><?= $a['status'] === 'active' ? 'Pause' : 'Activate' ?></a>
-                            <a href="automations.php?action=delete&id=<?= $a['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Delete this automation and all its steps/queue?')">Del</a>
+                            <a href="automations?view=edit&id=<?= $a['id'] ?>" class="btn btn-secondary btn-sm">Edit</a>
+                            <a href="automations?action=toggle&id=<?= $a['id'] ?>" class="btn btn-<?= $a['status'] === 'active' ? 'secondary' : 'primary' ?> btn-sm"><?= $a['status'] === 'active' ? 'Pause' : 'Activate' ?></a>
+                            <a href="automations?action=delete&id=<?= $a['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Delete this automation and all its steps/queue?')">Del</a>
                         </td>
                     </tr>
                     <?php endforeach; ?>

@@ -25,7 +25,7 @@ if (isPost() && ($_GET['action'] ?? '') === 'save_as_template') {
             setFlash('success', "Template '{$name}' saved.");
         }
     }
-    redirect('campaign-templates.php');
+    redirect('campaign-templates');
 }
 
 // Delete template
@@ -36,7 +36,7 @@ if (($_GET['action'] ?? '') === 'delete') {
         logActivity($_SESSION['admin_id'], 'delete_template', 'newsletter', $id);
         setFlash('success', 'Template deleted.');
     }
-    redirect('campaign-templates.php');
+    redirect('campaign-templates');
 }
 
 // Use template (create campaign from template)
@@ -52,9 +52,9 @@ if (($_GET['action'] ?? '') === 'use') {
         $newId = $db->lastInsertId();
         $db->prepare('UPDATE campaign_templates SET usage_count = usage_count + 1 WHERE id = ?')->execute([$id]);
         logActivity($_SESSION['admin_id'], 'use_template', 'newsletter', $id);
-        redirect('campaign-edit.php?id=' . $newId);
+        redirect('campaign-edit?id=' . $newId);
     }
-    redirect('campaign-templates.php');
+    redirect('campaign-templates');
 }
 
 // Duplicate campaign as template
@@ -69,7 +69,7 @@ if (($_GET['action'] ?? '') === 'from_campaign') {
         logActivity($_SESSION['admin_id'], 'duplicate_to_template', 'newsletter', $id);
         setFlash('success', 'Campaign saved as template.');
     }
-    redirect('campaign-templates.php');
+    redirect('campaign-templates');
 }
 
 // Load templates
@@ -86,7 +86,7 @@ renderHeader('Campaign Templates', 'newsletter');
 ?>
 
 <div class="msg-back" style="display:flex;justify-content:space-between;align-items:center;">
-    <a href="newsletter.php?tab=campaigns" class="btn btn-ghost btn-sm">
+    <a href="newsletter?tab=campaigns" class="btn btn-ghost btn-sm">
         <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/></svg>
         Back to Campaigns
     </a>
@@ -94,9 +94,9 @@ renderHeader('Campaign Templates', 'newsletter');
 
 <!-- Category Filters -->
 <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
-    <a href="campaign-templates.php" class="btn <?= !$filterCat ? 'btn-primary' : 'btn-secondary' ?> btn-sm">All</a>
+    <a href="campaign-templates" class="btn <?= !$filterCat ? 'btn-primary' : 'btn-secondary' ?> btn-sm">All</a>
     <?php foreach ($categories as $cat): ?>
-    <a href="campaign-templates.php?category=<?= urlencode($cat) ?>" class="btn <?= $filterCat === $cat ? 'btn-primary' : 'btn-secondary' ?> btn-sm"><?= sanitize($cat) ?></a>
+    <a href="campaign-templates?category=<?= urlencode($cat) ?>" class="btn <?= $filterCat === $cat ? 'btn-primary' : 'btn-secondary' ?> btn-sm"><?= sanitize($cat) ?></a>
     <?php endforeach; ?>
 </div>
 
@@ -122,8 +122,8 @@ renderHeader('Campaign Templates', 'newsletter');
             <p style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:12px;"><strong>Subject:</strong> <?= sanitize(substr($tpl['subject'], 0, 50)) ?></p>
             <?php endif; ?>
             <div style="display:flex;gap:6px;">
-                <a href="campaign-templates.php?action=use&id=<?= $tpl['id'] ?>" class="btn btn-primary btn-sm">Use Template</a>
-                <a href="campaign-templates.php?action=delete&id=<?= $tpl['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Delete this template?')">Del</a>
+                <a href="campaign-templates?action=use&id=<?= $tpl['id'] ?>" class="btn btn-primary btn-sm">Use Template</a>
+                <a href="campaign-templates?action=delete&id=<?= $tpl['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Delete this template?')">Del</a>
             </div>
         </div>
     </div>

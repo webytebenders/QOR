@@ -25,7 +25,7 @@
     }
 
     function send() {
-        fetch('admin/api/analytics.php?action=track', {
+        fetch('admin/api/analytics?action=track', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)

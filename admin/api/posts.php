@@ -130,7 +130,7 @@ if ($action === 'save' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = $_POST[CSRF_TOKEN_NAME] ?? '';
     if (!validateCSRF($token)) {
         setFlash('error', 'Invalid request.');
-        redirect('../posts.php');
+        redirect('../posts');
     }
 
     $id = (int)($_POST['id'] ?? 0);
@@ -146,7 +146,7 @@ if ($action === 'save' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (strlen($title) < 3) {
         setFlash('error', 'Title must be at least 3 characters.');
-        redirect('../post-edit.php' . ($id ? '?id=' . $id : ''));
+        redirect('../post-edit' . ($id ? '?id=' . $id : ''));
     }
 
     if (!$slug) {
@@ -196,10 +196,10 @@ if ($action === 'save' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             setFlash('error', 'Error saving post: ' . $e->getMessage());
         }
-        redirect('../post-edit.php' . ($id ? '?id=' . $id : ''));
+        redirect('../post-edit' . ($id ? '?id=' . $id : ''));
     }
 
-    redirect('../posts.php');
+    redirect('../posts');
 }
 
 // ===== ADMIN: Delete =====
@@ -209,7 +209,7 @@ if ($action === 'delete' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     requireRole('super_admin', 'editor');
 
     $token = $_POST[CSRF_TOKEN_NAME] ?? '';
-    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../posts.php'); }
+    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../posts'); }
 
     $id = (int)($_POST['id'] ?? 0);
     if ($id) {
@@ -223,7 +223,7 @@ if ($action === 'delete' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         logActivity($_SESSION['admin_id'], 'delete_post', 'post', $id, ['title' => $post['title'] ?? '']);
         setFlash('success', 'Post deleted.');
     }
-    redirect('../posts.php');
+    redirect('../posts');
 }
 
 // ===== ADMIN: Bulk Delete =====
@@ -233,7 +233,7 @@ if ($action === 'bulk_delete' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     requireRole('super_admin', 'editor');
 
     $token = $_POST[CSRF_TOKEN_NAME] ?? '';
-    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../posts.php'); }
+    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../posts'); }
 
     $ids = $_POST['ids'] ?? [];
     if (!empty($ids) && is_array($ids)) {
@@ -246,7 +246,7 @@ if ($action === 'bulk_delete' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         logActivity($_SESSION['admin_id'], 'bulk_delete_posts', 'post', null, ['count' => count($intIds)]);
         setFlash('success', count($intIds) . ' posts deleted.');
     }
-    redirect('../posts.php');
+    redirect('../posts');
 }
 
 // ===== ADMIN: Bulk Status =====
@@ -256,7 +256,7 @@ if ($action === 'bulk_status' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     requireRole('super_admin', 'editor');
 
     $token = $_POST[CSRF_TOKEN_NAME] ?? '';
-    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../posts.php'); }
+    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../posts'); }
 
     $ids = $_POST['ids'] ?? [];
     $newStatus = $_POST['status'] ?? '';
@@ -279,7 +279,7 @@ if ($action === 'bulk_status' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         logActivity($_SESSION['admin_id'], 'bulk_update_post_status', 'post', null, ['count' => count($intIds), 'status' => $newStatus]);
         setFlash('success', count($intIds) . ' posts updated to ' . ucfirst($newStatus) . '.');
     }
-    redirect('../posts.php');
+    redirect('../posts');
 }
 
 // ===== ADMIN: Toggle Featured =====
@@ -297,7 +297,7 @@ if ($action === 'toggle_featured' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         require_once '../includes/logger.php';
         logActivity($_SESSION['admin_id'], 'feature_post', 'post', $id);
     }
-    redirect('../posts.php');
+    redirect('../posts');
 }
 
 // ===== ADMIN: Duplicate Post =====
@@ -307,7 +307,7 @@ if ($action === 'duplicate' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     requireRole('super_admin', 'editor');
 
     $token = $_POST[CSRF_TOKEN_NAME] ?? '';
-    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../posts.php'); }
+    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../posts'); }
 
     $id = (int)($_POST['id'] ?? 0);
     if ($id) {
@@ -329,7 +329,7 @@ if ($action === 'duplicate' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             setFlash('success', "Post duplicated as draft: '{$newTitle}'");
         }
     }
-    redirect('../posts.php');
+    redirect('../posts');
 }
 
 // ===== ADMIN: Get Categories =====
@@ -349,7 +349,7 @@ if ($action === 'save_category' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     requireRole('super_admin', 'editor');
 
     $token = $_POST[CSRF_TOKEN_NAME] ?? '';
-    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../posts.php'); }
+    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../posts'); }
 
     $catId = (int)($_POST['cat_id'] ?? 0);
     $name = sanitize($_POST['cat_name'] ?? '');
@@ -357,7 +357,7 @@ if ($action === 'save_category' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (strlen($name) < 2) {
         setFlash('error', 'Category name must be at least 2 characters.');
-        redirect('../posts.php');
+        redirect('../posts');
     }
 
     $slug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $name));
@@ -382,7 +382,7 @@ if ($action === 'save_category' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     require_once '../includes/logger.php';
     logActivity($_SESSION['admin_id'], $catId ? 'update_category' : 'create_category', 'category', $catId ?: null, ['name' => $name]);
-    redirect('../posts.php');
+    redirect('../posts');
 }
 
 // ===== ADMIN: Delete Category =====
@@ -392,7 +392,7 @@ if ($action === 'delete_category' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     requireRole('super_admin', 'editor');
 
     $token = $_POST[CSRF_TOKEN_NAME] ?? '';
-    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../posts.php'); }
+    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../posts'); }
 
     $catId = (int)($_POST['cat_id'] ?? 0);
     if ($catId) {
@@ -414,7 +414,7 @@ if ($action === 'delete_category' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             setFlash('success', 'Category deleted. Posts moved to another category.');
         }
     }
-    redirect('../posts.php');
+    redirect('../posts');
 }
 
 // ===== ADMIN: Get media list for thumbnail picker =====

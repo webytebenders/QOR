@@ -27,7 +27,7 @@ try { $db->exec(file_get_contents(__DIR__ . '/../includes/schema_seo.sql')); } c
 // ===== Save Page SEO =====
 if ($action === 'save' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = $_POST[CSRF_TOKEN_NAME] ?? '';
-    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../seo.php'); }
+    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../seo'); }
 
     $pageFile = sanitize($_POST['page_file'] ?? '');
     $pageName = sanitize($_POST['page_name'] ?? '');
@@ -42,12 +42,12 @@ if ($action === 'save' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $structuredData = trim($_POST['structured_data'] ?? '');
     $customHead = $_POST['custom_head'] ?? '';
 
-    if (!$pageFile) { setFlash('error', 'Page file required.'); redirect('../seo.php?tab=pages'); }
+    if (!$pageFile) { setFlash('error', 'Page file required.'); redirect('../seo?tab=pages'); }
 
     // Validate JSON-LD if provided
     if ($structuredData && json_decode($structuredData) === null) {
         setFlash('error', 'Structured data must be valid JSON.');
-        redirect('../seo.php?tab=pages&edit=' . urlencode($pageFile));
+        redirect('../seo?tab=pages&edit=' . urlencode($pageFile));
     }
 
     // Calculate SEO score
@@ -83,7 +83,7 @@ if ($action === 'save' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     logActivity($_SESSION['admin_id'], 'update_seo', 'seo', null, ['page' => $pageFile, 'score' => $seoScore]);
     setFlash('success', "SEO for '{$pageName}' updated (score: {$seoScore}%).");
-    redirect('../seo.php?tab=pages&edit=' . urlencode($pageFile));
+    redirect('../seo?tab=pages&edit=' . urlencode($pageFile));
 }
 
 // ===== Generate Sitemap =====
@@ -103,7 +103,7 @@ if ($action === 'generate_sitemap') {
         elseif (in_array($fname, ['privacy.html', 'terms.html'])) { $priority = '0.3'; $freq = 'yearly'; }
         elseif (in_array($fname, ['about.html', 'ecosystem.html', 'tokenomics.html', 'security.html'])) { $priority = '0.8'; }
 
-        $loc = $fname === 'index.html' ? '/' : '/' . $fname;
+        $loc = $fname === 'index.html' ? '/' : '/' . str_replace('.html', '', $fname);
         $pages[] = ['loc' => $loc, 'priority' => $priority, 'changefreq' => $freq];
     }
 
@@ -118,7 +118,7 @@ if ($action === 'generate_sitemap') {
         $posts = $db->query("SELECT slug, updated_at FROM posts WHERE status = 'published' ORDER BY published_at DESC")->fetchAll();
         foreach ($posts as $post) {
             $pages[] = [
-                'loc' => '/blog-post.html?slug=' . $post['slug'],
+                'loc' => '/blog-post?slug=' . $post['slug'],
                 'priority' => '0.6',
                 'changefreq' => 'weekly',
                 'lastmod' => date('Y-m-d', strtotime($post['updated_at']))
@@ -150,26 +150,26 @@ if ($action === 'generate_sitemap') {
 
     logActivity($_SESSION['admin_id'], 'generate_sitemap', 'seo');
     setFlash('success', "sitemap.xml generated with {$urlCount} URLs.");
-    redirect('../seo.php?tab=sitemap');
+    redirect('../seo?tab=sitemap');
 }
 
 // ===== Save robots.txt =====
 if ($action === 'save_robots' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = $_POST[CSRF_TOKEN_NAME] ?? '';
-    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../seo.php?tab=robots'); }
+    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../seo?tab=robots'); }
 
     $content = $_POST['robots_content'] ?? '';
     file_put_contents(realpath(__DIR__ . '/../../') . '/robots.txt', $content);
 
     logActivity($_SESSION['admin_id'], 'update_robots', 'seo');
     setFlash('success', 'robots.txt saved.');
-    redirect('../seo.php?tab=robots');
+    redirect('../seo?tab=robots');
 }
 
 // ===== Save Redirect =====
 if ($action === 'save_redirect' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = $_POST[CSRF_TOKEN_NAME] ?? '';
-    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../seo.php?tab=redirects'); }
+    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../seo?tab=redirects'); }
 
     $source = trim($_POST['source_url'] ?? '');
     $target = trim($_POST['target_url'] ?? '');
@@ -177,7 +177,7 @@ if ($action === 'save_redirect' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!$source || !$target) {
         setFlash('error', 'Both source and target URLs are required.');
-        redirect('../seo.php?tab=redirects');
+        redirect('../seo?tab=redirects');
     }
 
     // Ensure source starts with /
@@ -196,7 +196,7 @@ if ($action === 'save_redirect' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     logActivity($_SESSION['admin_id'], 'add_redirect', 'seo', null, ['from' => $source, 'to' => $target]);
     setFlash('success', "Redirect added: {$source} -> {$target}");
-    redirect('../seo.php?tab=redirects');
+    redirect('../seo?tab=redirects');
 }
 
 // ===== Toggle Redirect =====
@@ -207,7 +207,7 @@ if ($action === 'toggle_redirect') {
         logActivity($_SESSION['admin_id'], 'toggle_redirect', 'seo', $id);
         setFlash('success', 'Redirect status updated.');
     }
-    redirect('../seo.php?tab=redirects');
+    redirect('../seo?tab=redirects');
 }
 
 // ===== Delete Redirect =====
@@ -218,7 +218,7 @@ if ($action === 'delete_redirect') {
         logActivity($_SESSION['admin_id'], 'delete_redirect', 'seo', $id);
         setFlash('success', 'Redirect deleted.');
     }
-    redirect('../seo.php?tab=redirects');
+    redirect('../seo?tab=redirects');
 }
 
 // ===== Export .htaccess =====
@@ -239,7 +239,7 @@ if ($action === 'export_htaccess') {
 
     logActivity($_SESSION['admin_id'], 'export_htaccess', 'seo');
     setFlash('success', '.htaccess-redirects file exported to site root. Merge into your .htaccess manually.');
-    redirect('../seo.php?tab=redirects');
+    redirect('../seo?tab=redirects');
 }
 
 // ===== Inject Meta Tags into HTML files =====
@@ -326,7 +326,7 @@ if ($action === 'inject_meta') {
 
     logActivity($_SESSION['admin_id'], 'inject_meta', 'seo', null, ['pages' => $injected]);
     setFlash('success', "Meta tags injected into {$injected} HTML file(s).");
-    redirect('../seo.php?tab=audit');
+    redirect('../seo?tab=audit');
 }
 
 // ===== Reset Page SEO to Defaults =====
@@ -337,7 +337,7 @@ if ($action === 'reset_page') {
         logActivity($_SESSION['admin_id'], 'reset_seo', 'seo', null, ['page' => $page]);
         setFlash('success', "SEO reset to defaults for {$page}.");
     }
-    redirect('../seo.php?tab=pages');
+    redirect('../seo?tab=pages');
 }
 
 // ===== Bulk Actions =====

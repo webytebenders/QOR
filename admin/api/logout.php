@@ -2,4 +2,4 @@
 require_once '../includes/auth.php';
 startSecureSession();
 logout();
-redirect('../index.php');
+redirect('../');

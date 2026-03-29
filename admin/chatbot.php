@@ -29,7 +29,7 @@ if (isPost() && ($_GET['action'] ?? '') === 'save_config') {
         logActivity($_SESSION['admin_id'], 'update_chatbot', 'chatbot');
         setFlash('success', 'Chatbot settings saved.');
     }
-    redirect('chatbot.php?tab=settings');
+    redirect('chatbot?tab=settings');
 }
 
 // Handle admin reply
@@ -47,7 +47,7 @@ if (isPost() && ($_GET['action'] ?? '') === 'admin_reply') {
             setFlash('success', 'Reply sent.');
         }
     }
-    redirect('chatbot.php?view=' . ($sessionId ?? 0));
+    redirect('chatbot?view=' . ($sessionId ?? 0));
 }
 
 // Handle session status change
@@ -58,7 +58,7 @@ if (($_GET['action'] ?? '') === 'close_session') {
         logActivity($_SESSION['admin_id'], 'close_chat', 'chatbot', $id);
         setFlash('success', 'Session closed.');
     }
-    redirect('chatbot.php');
+    redirect('chatbot');
 }
 if (($_GET['action'] ?? '') === 'escalate_session') {
     $id = (int)($_GET['id'] ?? 0);
@@ -67,7 +67,7 @@ if (($_GET['action'] ?? '') === 'escalate_session') {
         logActivity($_SESSION['admin_id'], 'escalate_chat', 'chatbot', $id);
         setFlash('success', 'Session escalated.');
     }
-    redirect('chatbot.php?view=' . $id);
+    redirect('chatbot?view=' . $id);
 }
 if (($_GET['action'] ?? '') === 'delete_session') {
     $id = (int)($_GET['id'] ?? 0);
@@ -76,7 +76,7 @@ if (($_GET['action'] ?? '') === 'delete_session') {
         logActivity($_SESSION['admin_id'], 'delete_chat', 'chatbot', $id);
         setFlash('success', 'Session deleted.');
     }
-    redirect('chatbot.php');
+    redirect('chatbot');
 }
 
 // Handle knowledge seed
@@ -85,7 +85,7 @@ if (($_GET['action'] ?? '') === 'seed_knowledge') {
     $seeded = seedKnowledge($db);
     logActivity($_SESSION['admin_id'], 'seed_knowledge', 'chatbot', null, ['count' => $seeded]);
     setFlash('success', $seeded > 0 ? "Seeded {$seeded} knowledge entries from defaults." : 'Knowledge base already has entries.');
-    redirect('chatbot.php?tab=knowledge');
+    redirect('chatbot?tab=knowledge');
 }
 
 // Handle knowledge save
@@ -112,26 +112,26 @@ if (isPost() && ($_GET['action'] ?? '') === 'save_knowledge') {
             setFlash('error', 'Keywords and response are required.');
         }
     }
-    redirect('chatbot.php?tab=knowledge');
+    redirect('chatbot?tab=knowledge');
 }
 
 // Handle knowledge toggle/delete
 if (($_GET['action'] ?? '') === 'toggle_knowledge') {
     $id = (int)($_GET['id'] ?? 0);
     if ($id) { $db->prepare('UPDATE chat_knowledge SET is_active = NOT is_active WHERE id = ?')->execute([$id]); }
-    redirect('chatbot.php?tab=knowledge');
+    redirect('chatbot?tab=knowledge');
 }
 if (($_GET['action'] ?? '') === 'delete_knowledge') {
     $id = (int)($_GET['id'] ?? 0);
     if ($id) { $db->prepare('DELETE FROM chat_knowledge WHERE id = ?')->execute([$id]); }
-    redirect('chatbot.php?tab=knowledge');
+    redirect('chatbot?tab=knowledge');
 }
 
 // Handle dismiss unanswered
 if (($_GET['action'] ?? '') === 'dismiss_unanswered') {
     $id = (int)($_GET['id'] ?? 0);
     if ($id) { $db->prepare('DELETE FROM chat_unanswered WHERE id = ?')->execute([$id]); }
-    redirect('chatbot.php?tab=analytics');
+    redirect('chatbot?tab=analytics');
 }
 
 // Get config
@@ -261,27 +261,27 @@ renderHeader('Chatbot', 'chatbot');
 </div>
 
 <div class="tabs">
-    <a href="chatbot.php?tab=sessions" class="tab <?= $tab === 'sessions' && !$viewId ? 'tab-active' : '' ?>">Sessions</a>
-    <a href="chatbot.php?tab=knowledge" class="tab <?= $tab === 'knowledge' ? 'tab-active' : '' ?>">Knowledge Base</a>
-    <a href="chatbot.php?tab=analytics" class="tab <?= $tab === 'analytics' ? 'tab-active' : '' ?>">Analytics</a>
-    <a href="chatbot.php?tab=settings" class="tab <?= $tab === 'settings' ? 'tab-active' : '' ?>">Settings</a>
+    <a href="chatbot?tab=sessions" class="tab <?= $tab === 'sessions' && !$viewId ? 'tab-active' : '' ?>">Sessions</a>
+    <a href="chatbot?tab=knowledge" class="tab <?= $tab === 'knowledge' ? 'tab-active' : '' ?>">Knowledge Base</a>
+    <a href="chatbot?tab=analytics" class="tab <?= $tab === 'analytics' ? 'tab-active' : '' ?>">Analytics</a>
+    <a href="chatbot?tab=settings" class="tab <?= $tab === 'settings' ? 'tab-active' : '' ?>">Settings</a>
 </div>
 
 <?php if ($viewSession): ?>
 <!-- ==================== CHAT SESSION VIEW ==================== -->
 <div class="msg-back" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-    <a href="chatbot.php" class="btn btn-ghost btn-sm">
+    <a href="chatbot" class="btn btn-ghost btn-sm">
         <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/></svg>
         Back to Sessions
     </a>
     <div style="display:flex;gap:6px;">
         <?php if ($viewSession['status'] !== 'escalated'): ?>
-        <a href="chatbot.php?action=escalate_session&id=<?= $viewSession['id'] ?>" class="btn btn-secondary btn-sm" onclick="return confirm('Escalate this session?')">Escalate</a>
+        <a href="chatbot?action=escalate_session&id=<?= $viewSession['id'] ?>" class="btn btn-secondary btn-sm" onclick="return confirm('Escalate this session?')">Escalate</a>
         <?php endif; ?>
         <?php if ($viewSession['status'] !== 'closed'): ?>
-        <a href="chatbot.php?action=close_session&id=<?= $viewSession['id'] ?>" class="btn btn-secondary btn-sm">Close</a>
+        <a href="chatbot?action=close_session&id=<?= $viewSession['id'] ?>" class="btn btn-secondary btn-sm">Close</a>
         <?php endif; ?>
-        <a href="chatbot.php?action=delete_session&id=<?= $viewSession['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Delete this session and all messages?')">Delete</a>
+        <a href="chatbot?action=delete_session&id=<?= $viewSession['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Delete this session and all messages?')">Delete</a>
     </div>
 </div>
 
@@ -311,7 +311,7 @@ renderHeader('Chatbot', 'chatbot');
 
         <!-- Admin Reply -->
         <?php if ($viewSession['status'] !== 'closed'): ?>
-        <form method="POST" action="chatbot.php?action=admin_reply" style="margin-top:20px;border-top:1px solid var(--border);padding-top:16px;">
+        <form method="POST" action="chatbot?action=admin_reply" style="margin-top:20px;border-top:1px solid var(--border);padding-top:16px;">
             <?= csrfField() ?>
             <input type="hidden" name="session_id" value="<?= $viewSession['id'] ?>">
             <div class="form-group" style="margin-bottom:12px;">
@@ -334,7 +334,7 @@ renderHeader('Chatbot', 'chatbot');
 <div class="card" style="margin-bottom:20px;">
     <div class="card-header"><h2><?= $editKnowledge ? 'Edit' : 'Add' ?> Knowledge Entry</h2></div>
     <div class="card-body">
-        <form method="POST" action="chatbot.php?action=save_knowledge">
+        <form method="POST" action="chatbot?action=save_knowledge">
             <?= csrfField() ?>
             <?php if ($editKnowledge): ?>
             <input type="hidden" name="id" value="<?= $editKnowledge['id'] ?>">
@@ -361,9 +361,9 @@ renderHeader('Chatbot', 'chatbot');
             <div style="display:flex;gap:8px;">
                 <button type="submit" class="btn btn-primary"><?= $editKnowledge ? 'Update' : 'Add' ?> Entry</button>
                 <?php if ($editKnowledge): ?>
-                <a href="chatbot.php?tab=knowledge" class="btn btn-ghost">Cancel</a>
+                <a href="chatbot?tab=knowledge" class="btn btn-ghost">Cancel</a>
                 <?php endif; ?>
-                <a href="chatbot.php?action=seed_knowledge" class="btn btn-secondary" style="margin-left:auto;" onclick="return confirm('Seed knowledge base from default entries? (Only works if DB is empty)')">Seed from Defaults</a>
+                <a href="chatbot?action=seed_knowledge" class="btn btn-secondary" style="margin-left:auto;" onclick="return confirm('Seed knowledge base from default entries? (Only works if DB is empty)')">Seed from Defaults</a>
             </div>
         </form>
     </div>
@@ -402,10 +402,10 @@ renderHeader('Chatbot', 'chatbot');
                             <div class="action-dropdown">
                                 <button class="btn btn-secondary btn-sm" onclick="this.nextElementSibling.classList.toggle('show')">Actions &#9662;</button>
                                 <div class="dropdown-menu">
-                                    <a href="chatbot.php?tab=knowledge&edit_knowledge=<?= $k['id'] ?>" class="dropdown-item">Edit</a>
-                                    <a href="chatbot.php?action=toggle_knowledge&id=<?= $k['id'] ?>" class="dropdown-item"><?= $k['is_active'] ? 'Disable' : 'Enable' ?></a>
+                                    <a href="chatbot?tab=knowledge&edit_knowledge=<?= $k['id'] ?>" class="dropdown-item">Edit</a>
+                                    <a href="chatbot?action=toggle_knowledge&id=<?= $k['id'] ?>" class="dropdown-item"><?= $k['is_active'] ? 'Disable' : 'Enable' ?></a>
                                     <div class="dropdown-divider"></div>
-                                    <a href="chatbot.php?action=delete_knowledge&id=<?= $k['id'] ?>" class="dropdown-item dropdown-item-danger" onclick="return confirm('Delete this entry?')">Delete</a>
+                                    <a href="chatbot?action=delete_knowledge&id=<?= $k['id'] ?>" class="dropdown-item dropdown-item-danger" onclick="return confirm('Delete this entry?')">Delete</a>
                                 </div>
                             </div>
                         </td>
@@ -483,7 +483,7 @@ renderHeader('Chatbot', 'chatbot');
                         <tr>
                             <td style="font-size:0.85rem;"><?= sanitize(substr($u['message'], 0, 60)) ?></td>
                             <td class="msg-date"><?= timeAgo($u['created_at']) ?></td>
-                            <td><a href="chatbot.php?action=dismiss_unanswered&id=<?= $u['id'] ?>" class="btn btn-ghost btn-sm" title="Dismiss">&times;</a></td>
+                            <td><a href="chatbot?action=dismiss_unanswered&id=<?= $u['id'] ?>" class="btn btn-ghost btn-sm" title="Dismiss">&times;</a></td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -533,7 +533,7 @@ renderHeader('Chatbot', 'chatbot');
 
 <?php elseif ($tab === 'settings'): ?>
 <!-- ==================== SETTINGS ==================== -->
-<form method="POST" action="chatbot.php?action=save_config">
+<form method="POST" action="chatbot?action=save_config">
     <?= csrfField() ?>
     <div class="editor-grid">
         <div class="editor-main">
@@ -623,7 +623,7 @@ renderHeader('Chatbot', 'chatbot');
                 <div class="card-header"><h2>Deploy Widget</h2></div>
                 <div class="card-body">
                     <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.6;margin-bottom:12px;">Add the chat widget to your website pages. Click the button below to auto-inject the widget script into all HTML pages.</p>
-                    <a href="api/chat.php?action=deploy_widget" class="btn btn-primary btn-full" onclick="return confirm('This will add the chat widget script to all HTML pages. Continue?')">
+                    <a href="api/chat?action=deploy_widget" class="btn btn-primary btn-full" onclick="return confirm('This will add the chat widget script to all HTML pages. Continue?')">
                         <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
                         Deploy to All Pages
                     </a>
@@ -639,10 +639,10 @@ renderHeader('Chatbot', 'chatbot');
 
 <!-- Status filters -->
 <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
-    <a href="chatbot.php" class="btn <?= !$statusFilter ? 'btn-primary' : 'btn-secondary' ?> btn-sm">All (<?= $totalSessions ?>)</a>
-    <a href="chatbot.php?status=active" class="btn <?= $statusFilter === 'active' ? 'btn-primary' : 'btn-secondary' ?> btn-sm">Active</a>
-    <a href="chatbot.php?status=escalated" class="btn <?= $statusFilter === 'escalated' ? 'btn-primary' : 'btn-secondary' ?> btn-sm">Escalated<?= $escalatedCount > 0 ? " ({$escalatedCount})" : '' ?></a>
-    <a href="chatbot.php?status=closed" class="btn <?= $statusFilter === 'closed' ? 'btn-primary' : 'btn-secondary' ?> btn-sm">Closed</a>
+    <a href="chatbot" class="btn <?= !$statusFilter ? 'btn-primary' : 'btn-secondary' ?> btn-sm">All (<?= $totalSessions ?>)</a>
+    <a href="chatbot?status=active" class="btn <?= $statusFilter === 'active' ? 'btn-primary' : 'btn-secondary' ?> btn-sm">Active</a>
+    <a href="chatbot?status=escalated" class="btn <?= $statusFilter === 'escalated' ? 'btn-primary' : 'btn-secondary' ?> btn-sm">Escalated<?= $escalatedCount > 0 ? " ({$escalatedCount})" : '' ?></a>
+    <a href="chatbot?status=closed" class="btn <?= $statusFilter === 'closed' ? 'btn-primary' : 'btn-secondary' ?> btn-sm">Closed</a>
 </div>
 
 <div class="card">
@@ -681,9 +681,9 @@ renderHeader('Chatbot', 'chatbot');
                         </td>
                         <td class="msg-date"><?= timeAgo($s['created_at']) ?></td>
                         <td style="white-space:nowrap;">
-                            <a href="chatbot.php?view=<?= $s['id'] ?>" class="btn btn-secondary btn-sm">View</a>
+                            <a href="chatbot?view=<?= $s['id'] ?>" class="btn btn-secondary btn-sm">View</a>
                             <?php if ($s['status'] !== 'closed'): ?>
-                            <a href="chatbot.php?action=close_session&id=<?= $s['id'] ?>" class="btn btn-ghost btn-sm" title="Close">&#10005;</a>
+                            <a href="chatbot?action=close_session&id=<?= $s['id'] ?>" class="btn btn-ghost btn-sm" title="Close">&#10005;</a>
                             <?php endif; ?>
                         </td>
                     </tr>

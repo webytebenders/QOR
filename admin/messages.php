@@ -77,12 +77,12 @@ renderHeader('Messages', 'messages');
 <?php if ($viewing): ?>
 <!-- Single Message View -->
 <div class="msg-back">
-    <a href="messages.php" class="btn btn-ghost btn-sm">
+    <a href="messages" class="btn btn-ghost btn-sm">
         <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/></svg>
         Back to Inbox
     </a>
     <div class="msg-actions-top">
-        <form method="POST" action="api/contacts.php?action=update_status&view=<?= $viewing['id'] ?>" style="display:inline">
+        <form method="POST" action="api/contacts?action=update_status&view=<?= $viewing['id'] ?>" style="display:inline">
             <?= csrfField() ?>
             <input type="hidden" name="id" value="<?= $viewing['id'] ?>">
             <?php if ($viewing['status'] !== 'archived'): ?>
@@ -93,7 +93,7 @@ renderHeader('Messages', 'messages');
             <button type="submit" class="btn btn-secondary btn-sm">Unarchive</button>
             <?php endif; ?>
         </form>
-        <form method="POST" action="api/contacts.php?action=delete" style="display:inline" onsubmit="return confirm('Delete this message permanently?')">
+        <form method="POST" action="api/contacts?action=delete" style="display:inline" onsubmit="return confirm('Delete this message permanently?')">
             <?= csrfField() ?>
             <input type="hidden" name="id" value="<?= $viewing['id'] ?>">
             <button type="submit" class="btn btn-danger btn-sm">Delete</button>
@@ -131,7 +131,7 @@ renderHeader('Messages', 'messages');
 
         <div class="msg-reply-form">
             <h4><?= $viewing['reply_text'] ? 'Update Reply' : 'Reply' ?></h4>
-            <form method="POST" action="api/contacts.php?action=reply">
+            <form method="POST" action="api/contacts?action=reply">
                 <?= csrfField() ?>
                 <input type="hidden" name="id" value="<?= $viewing['id'] ?>">
                 <div class="form-group">
@@ -154,13 +154,13 @@ renderHeader('Messages', 'messages');
 <!-- Inbox List View -->
 
 <div class="stats-row">
-    <a href="messages.php" class="stat-widget stat-clickable <?= !$filterStatus ? 'stat-active' : '' ?>">
+    <a href="messages" class="stat-widget stat-clickable <?= !$filterStatus ? 'stat-active' : '' ?>">
         <div class="stat-widget-data">
             <span class="stat-widget-value"><?= $countAll ?></span>
             <span class="stat-widget-label">All</span>
         </div>
     </a>
-    <a href="messages.php?status=new" class="stat-widget stat-clickable <?= $filterStatus === 'new' ? 'stat-active' : '' ?>">
+    <a href="messages?status=new" class="stat-widget stat-clickable <?= $filterStatus === 'new' ? 'stat-active' : '' ?>">
         <div class="stat-widget-icon orange">
             <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>
         </div>
@@ -169,13 +169,13 @@ renderHeader('Messages', 'messages');
             <span class="stat-widget-label">New</span>
         </div>
     </a>
-    <a href="messages.php?status=read" class="stat-widget stat-clickable <?= $filterStatus === 'read' ? 'stat-active' : '' ?>">
+    <a href="messages?status=read" class="stat-widget stat-clickable <?= $filterStatus === 'read' ? 'stat-active' : '' ?>">
         <div class="stat-widget-data">
             <span class="stat-widget-value"><?= $countRead ?></span>
             <span class="stat-widget-label">Read</span>
         </div>
     </a>
-    <a href="messages.php?status=replied" class="stat-widget stat-clickable <?= $filterStatus === 'replied' ? 'stat-active' : '' ?>">
+    <a href="messages?status=replied" class="stat-widget stat-clickable <?= $filterStatus === 'replied' ? 'stat-active' : '' ?>">
         <div class="stat-widget-data">
             <span class="stat-widget-value"><?= $countReplied ?></span>
             <span class="stat-widget-label">Replied</span>
@@ -195,11 +195,11 @@ renderHeader('Messages', 'messages');
         <?php if ($filterStatus): ?><input type="hidden" name="status" value="<?= sanitize($filterStatus) ?>"><?php endif; ?>
         <button type="submit" class="btn btn-secondary btn-sm">Filter</button>
         <?php if ($search || $filterSubject): ?>
-        <a href="messages.php<?= $filterStatus ? '?status=' . $filterStatus : '' ?>" class="btn btn-ghost btn-sm">Clear</a>
+        <a href="messages<?= $filterStatus ? '?status=' . $filterStatus : '' ?>" class="btn btn-ghost btn-sm">Clear</a>
         <?php endif; ?>
     </form>
     <div class="filters-actions">
-        <a href="api/contacts.php?action=export&status=<?= urlencode($filterStatus) ?>&subject=<?= urlencode($filterSubject) ?>" class="btn btn-secondary btn-sm">
+        <a href="api/contacts?action=export&status=<?= urlencode($filterStatus) ?>&subject=<?= urlencode($filterSubject) ?>" class="btn btn-secondary btn-sm">
             <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
             Export
         </a>
@@ -225,7 +225,7 @@ renderHeader('Messages', 'messages');
                     <tr><td colspan="5" class="empty-state">No messages yet.</td></tr>
                     <?php else: ?>
                     <?php foreach ($messages as $msg): ?>
-                    <tr class="msg-row <?= $msg['status'] === 'new' ? 'msg-unread' : '' ?>" onclick="window.location='messages.php?view=<?= $msg['id'] ?>'" style="cursor:pointer">
+                    <tr class="msg-row <?= $msg['status'] === 'new' ? 'msg-unread' : '' ?>" onclick="window.location='messages?view=<?= $msg['id'] ?>'" style="cursor:pointer">
                         <td><span class="status-dot status-dot-<?= $msg['status'] ?>"></span></td>
                         <td>
                             <div class="msg-from">

@@ -143,12 +143,12 @@ renderHeader('SEO Manager', 'seo');
 
 <!-- Tabs -->
 <div class="tabs">
-    <a href="seo.php?tab=audit" class="tab <?= $tab === 'audit' ? 'tab-active' : '' ?>">Audit</a>
-    <a href="seo.php?tab=pages" class="tab <?= $tab === 'pages' ? 'tab-active' : '' ?>">Pages</a>
-    <a href="seo.php?tab=structured" class="tab <?= $tab === 'structured' ? 'tab-active' : '' ?>">Structured Data</a>
-    <a href="seo.php?tab=redirects" class="tab <?= $tab === 'redirects' ? 'tab-active' : '' ?>">Redirects</a>
-    <a href="seo.php?tab=robots" class="tab <?= $tab === 'robots' ? 'tab-active' : '' ?>">robots.txt</a>
-    <a href="seo.php?tab=sitemap" class="tab <?= $tab === 'sitemap' ? 'tab-active' : '' ?>">Sitemap</a>
+    <a href="seo?tab=audit" class="tab <?= $tab === 'audit' ? 'tab-active' : '' ?>">Audit</a>
+    <a href="seo?tab=pages" class="tab <?= $tab === 'pages' ? 'tab-active' : '' ?>">Pages</a>
+    <a href="seo?tab=structured" class="tab <?= $tab === 'structured' ? 'tab-active' : '' ?>">Structured Data</a>
+    <a href="seo?tab=redirects" class="tab <?= $tab === 'redirects' ? 'tab-active' : '' ?>">Redirects</a>
+    <a href="seo?tab=robots" class="tab <?= $tab === 'robots' ? 'tab-active' : '' ?>">robots.txt</a>
+    <a href="seo?tab=sitemap" class="tab <?= $tab === 'sitemap' ? 'tab-active' : '' ?>">Sitemap</a>
 </div>
 
 <?php if ($tab === 'audit'): ?>
@@ -202,7 +202,7 @@ renderHeader('SEO Manager', 'seo');
             <strong>Inject Meta Tags</strong>
             <p style="font-size:0.8rem;color:var(--text-muted);margin:4px 0 0;">Write saved SEO data (meta, OG, JSON-LD) into your static HTML files.</p>
         </div>
-        <a href="api/seo.php?action=inject_meta" class="btn btn-primary" onclick="return confirm('This will modify your HTML files. Continue?')">
+        <a href="api/seo?action=inject_meta" class="btn btn-primary" onclick="return confirm('This will modify your HTML files. Continue?')">
             <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
             Inject All Pages
         </a>
@@ -255,7 +255,7 @@ renderHeader('SEO Manager', 'seo');
                             <?php endif; ?>
                         </td>
                         <td>
-                            <a href="seo.php?tab=pages&edit=<?= urlencode($a['page']['file']) ?>" class="btn btn-secondary btn-sm">Fix</a>
+                            <a href="seo?tab=pages&edit=<?= urlencode($a['page']['file']) ?>" class="btn btn-secondary btn-sm">Fix</a>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -268,13 +268,13 @@ renderHeader('SEO Manager', 'seo');
 <?php elseif ($tab === 'pages' && $editing): ?>
 <!-- ==================== EDIT PAGE SEO ==================== -->
 <div class="msg-back">
-    <a href="seo.php?tab=pages" class="btn btn-ghost btn-sm">
+    <a href="seo?tab=pages" class="btn btn-ghost btn-sm">
         <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/></svg>
         Back to Pages
     </a>
 </div>
 
-<form method="POST" action="api/seo.php?action=save">
+<form method="POST" action="api/seo?action=save">
     <?= csrfField() ?>
     <input type="hidden" name="page_file" value="<?= sanitize($editing['page_file']) ?>">
     <input type="hidden" name="page_name" value="<?= sanitize($editing['page_name'] ?? '') ?>">
@@ -464,7 +464,7 @@ updateSeoChecklist();
         <button class="btn btn-secondary btn-sm" onclick="runBulkAction()">Apply</button>
         <span style="font-size:0.8rem;color:var(--text-muted);" id="bulkStatus"></span>
         <div style="margin-left:auto;display:flex;gap:8px;">
-            <a href="api/seo.php?action=inject_meta" class="btn btn-primary btn-sm" onclick="return confirm('Inject meta into all HTML files?')">Inject All</a>
+            <a href="api/seo?action=inject_meta" class="btn btn-primary btn-sm" onclick="return confirm('Inject meta into all HTML files?')">Inject All</a>
         </div>
     </div>
 </div>
@@ -498,15 +498,15 @@ updateSeoChecklist();
                         </td>
                         <td><?= ($seo && $seo['no_index']) ? '<span class="badge-red">No</span>' : '<span class="badge-green">Yes</span>' ?></td>
                         <td style="white-space:nowrap;">
-                            <a href="seo.php?tab=pages&edit=<?= urlencode($p['file']) ?>" class="btn btn-secondary btn-sm">Edit</a>
+                            <a href="seo?tab=pages&edit=<?= urlencode($p['file']) ?>" class="btn btn-secondary btn-sm">Edit</a>
                             <a href="../<?= urlencode($p['file']) ?>" target="_blank" class="btn btn-ghost btn-sm" title="View live page">
                                 <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/></svg>
                             </a>
                             <?php if ($seo): ?>
-                            <a href="api/seo.php?action=duplicate&page=<?= urlencode($p['file']) ?>" class="btn btn-ghost btn-sm" title="Duplicate SEO to clipboard" onclick="event.preventDefault(); copySeoData('<?= sanitize($p['file']) ?>');">
+                            <a href="api/seo?action=duplicate&page=<?= urlencode($p['file']) ?>" class="btn btn-ghost btn-sm" title="Duplicate SEO to clipboard" onclick="event.preventDefault(); copySeoData('<?= sanitize($p['file']) ?>');">
                                 <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path d="M7 9a2 2 0 012-2h6a2 2 0 012 2v6a2 2 0 01-2 2H9a2 2 0 01-2-2V9z"/><path d="M5 3a2 2 0 00-2 2v6a2 2 0 002 2V5h8a2 2 0 00-2-2H5z"/></svg>
                             </a>
-                            <a href="api/seo.php?action=reset_page&page=<?= urlencode($p['file']) ?>" class="btn btn-ghost btn-sm" title="Reset to defaults" onclick="return confirm('Reset SEO for <?= sanitize($p['name']) ?> to defaults?')">
+                            <a href="api/seo?action=reset_page&page=<?= urlencode($p['file']) ?>" class="btn btn-ghost btn-sm" title="Reset to defaults" onclick="return confirm('Reset SEO for <?= sanitize($p['name']) ?> to defaults?')">
                                 <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/></svg>
                             </a>
                             <?php endif; ?>
@@ -535,7 +535,7 @@ function runBulkAction() {
     if (!action) { alert('Select an action.'); return; }
     if (!checked.length) { alert('Select at least one page.'); return; }
     if (!confirm('Apply "' + action + '" to ' + checked.length + ' page(s)?')) return;
-    fetch('api/seo.php?action=bulk', {
+    fetch('api/seo?action=bulk', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({bulk_action: action, pages: checked, csrf_token: '<?= generateCSRFToken() ?>'})
@@ -629,7 +629,7 @@ function runBulkAction() {
                         <td><strong><?= $p['name'] ?></strong></td>
                         <td><?= $hasLd ? '<span class="badge-green">Yes</span>' : '<span class="badge-gray">No</span>' ?></td>
                         <td><code style="font-size:0.8rem;"><?= sanitize($schemaType) ?></code></td>
-                        <td><a href="seo.php?tab=pages&edit=<?= urlencode($p['file']) ?>" class="btn btn-secondary btn-sm">Edit</a></td>
+                        <td><a href="seo?tab=pages&edit=<?= urlencode($p['file']) ?>" class="btn btn-secondary btn-sm">Edit</a></td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -653,7 +653,7 @@ function runBulkAction() {
         '@type' => 'WebSite',
         'name' => 'Core Chain',
         'url' => APP_URL,
-        'potentialAction' => ['@type' => 'SearchAction', 'target' => APP_URL . '/blog.html?q={search_term_string}', 'query-input' => 'required name=search_term_string']
+        'potentialAction' => ['@type' => 'SearchAction', 'target' => APP_URL . '/blog?q={search_term_string}', 'query-input' => 'required name=search_term_string']
     ],
     'article' => [
         '@context' => 'https://schema.org',
@@ -677,7 +677,7 @@ function runBulkAction() {
         '@type' => 'BreadcrumbList',
         'itemListElement' => [
             ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => APP_URL],
-            ['@type' => 'ListItem', 'position' => 2, 'name' => 'Page Name', 'item' => APP_URL . '/page.html']
+            ['@type' => 'ListItem', 'position' => 2, 'name' => 'Page Name', 'item' => APP_URL . '/page']
         ]
     ],
     'product' => [
@@ -707,15 +707,15 @@ function copyJsonLd(type) {
         <h2>Add Redirect</h2>
     </div>
     <div class="card-body">
-        <form method="POST" action="api/seo.php?action=save_redirect" style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
+        <form method="POST" action="api/seo?action=save_redirect" style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
             <?= csrfField() ?>
             <div class="form-group" style="flex:1;min-width:200px;margin:0;">
                 <label>From URL</label>
-                <input type="text" name="source_url" placeholder="/old-page.html" required>
+                <input type="text" name="source_url" placeholder="/old-page" required>
             </div>
             <div class="form-group" style="flex:1;min-width:200px;margin:0;">
                 <label>To URL</label>
-                <input type="text" name="target_url" placeholder="/new-page.html" required>
+                <input type="text" name="target_url" placeholder="/new-page" required>
             </div>
             <div class="form-group" style="width:120px;margin:0;">
                 <label>Status</label>
@@ -733,7 +733,7 @@ function copyJsonLd(type) {
 <div class="card" style="margin-bottom:20px;">
     <div class="card-header">
         <h2>Active Redirects</h2>
-        <a href="api/seo.php?action=export_htaccess" class="btn btn-secondary btn-sm">Export .htaccess</a>
+        <a href="api/seo?action=export_htaccess" class="btn btn-secondary btn-sm">Export .htaccess</a>
     </div>
     <div class="card-body no-pad">
         <div class="table-wrap">
@@ -760,9 +760,9 @@ function copyJsonLd(type) {
                             <div class="action-dropdown">
                                 <button class="btn btn-secondary btn-sm" onclick="this.nextElementSibling.classList.toggle('show')">Actions &#9662;</button>
                                 <div class="dropdown-menu">
-                                    <a href="api/seo.php?action=toggle_redirect&id=<?= $r['id'] ?>" class="dropdown-item"><?= $r['is_active'] ? 'Disable' : 'Enable' ?></a>
+                                    <a href="api/seo?action=toggle_redirect&id=<?= $r['id'] ?>" class="dropdown-item"><?= $r['is_active'] ? 'Disable' : 'Enable' ?></a>
                                     <div class="dropdown-divider"></div>
-                                    <a href="api/seo.php?action=delete_redirect&id=<?= $r['id'] ?>" class="dropdown-item dropdown-item-danger" onclick="return confirm('Delete this redirect?')">Delete</a>
+                                    <a href="api/seo?action=delete_redirect&id=<?= $r['id'] ?>" class="dropdown-item dropdown-item-danger" onclick="return confirm('Delete this redirect?')">Delete</a>
                                 </div>
                             </div>
                         </td>
@@ -786,7 +786,7 @@ function copyJsonLd(type) {
 <div class="card">
     <div class="card-header"><h2>robots.txt</h2></div>
     <div class="card-body">
-        <form method="POST" action="api/seo.php?action=save_robots">
+        <form method="POST" action="api/seo?action=save_robots">
             <?= csrfField() ?>
             <div class="form-group">
                 <textarea name="robots_content" rows="12" style="font-family:monospace;font-size:0.85rem;"><?= htmlspecialchars($robotsContent) ?></textarea>
@@ -819,7 +819,7 @@ function copyJsonLd(type) {
         </div>
 
         <div style="margin-top:20px; display:flex; gap:8px;">
-            <a href="api/seo.php?action=generate_sitemap" class="btn btn-primary">
+            <a href="api/seo?action=generate_sitemap" class="btn btn-primary">
                 <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/></svg>
                 <?= $sitemapExists ? 'Regenerate' : 'Generate' ?> Sitemap
             </a>

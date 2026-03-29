@@ -19,10 +19,10 @@ define('SMTP_FROM_EMAIL', 'admin@yourdomain.com');
 define('APP_NAME', 'Core Chain Admin');
 define('APP_URL', 'https://yourdomain.com');
 define('ADMIN_URL', APP_URL . '/admin');
-define('SESSION_LIFETIME', 1800); // 30 minutes
+define('SESSION_LIFETIME', 1800);
 define('MAX_LOGIN_ATTEMPTS', 5);
-define('LOCKOUT_DURATION', 900); // 15 minutes
-define('ACTIVITY_LOG_RETENTION', 90); // days
+define('LOCKOUT_DURATION', 900);
+define('ACTIVITY_LOG_RETENTION', 90);
 
 // ===== SECURITY =====
 define('CSRF_TOKEN_NAME', 'csrf_token');

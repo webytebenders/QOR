@@ -219,9 +219,9 @@ renderHeader('Activity Log', 'activity');
             </div>
             <button type="submit" class="btn btn-primary btn-sm">Filter</button>
             <?php if ($filterAdmin || $filterAction || $filterSearch || $filterRange): ?>
-            <a href="activity.php" class="btn btn-ghost btn-sm">Clear</a>
+            <a href="activity" class="btn btn-ghost btn-sm">Clear</a>
             <?php endif; ?>
-            <a href="activity.php?<?= buildQS(['export' => 'csv']) ?>" class="btn btn-secondary btn-sm" title="Export filtered results">
+            <a href="activity?<?= buildQS(['export' => 'csv']) ?>" class="btn btn-secondary btn-sm" title="Export filtered results">
                 <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
                 CSV
             </a>

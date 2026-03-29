@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Core Chain Blog">
   <title>Loading... — Core Chain Blog</title>
+  <link rel="icon" type="image/png" href="assets/images/favicon.png">
   <link rel="stylesheet" href="css/styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -41,20 +42,20 @@
   <!-- Navbar (same as blog.html) -->
   <nav class="navbar" id="navbar">
     <div class="nav-container">
-      <a href="index.html" class="nav-logo">
+      <a href="/" class="nav-logo">
         <img src="assets/images/qor-logo.png" alt="QOR" class="logo-img">
       </a>
       <a href="Whitepaper%20QOR.pdf" target="_blank" class="nav-whitepaper">Whitepaper</a>
       <ul class="nav-links" id="navLinks">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="about.html">About</a></li>
-        <li><a href="ecosystem.html">Ecosystem</a></li>
-        <li><a href="tokenomics.html">Tokenomics</a></li>
-        <li><a href="security.html">Security</a></li>
-        <li><a href="blog.html" class="active">Blog</a></li>
-        <li><a href="contact.html">Contact</a></li>
+        <li><a href="/">Home</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/ecosystem">Ecosystem</a></li>
+        <li><a href="/tokenomics">Tokenomics</a></li>
+        <li><a href="/security">Security</a></li>
+        <li><a href="/blog" class="active">Blog</a></li>
+        <li><a href="/contact">Contact</a></li>
       </ul>
-      <a href="index.html#waitlist" class="nav-cta">Get Early Access</a>
+      <a href="/#waitlist" class="nav-cta">Get Early Access</a>
       <button class="hamburger" id="hamburger" aria-label="Toggle menu">
         <span></span><span></span><span></span>
       </button>
@@ -63,15 +64,15 @@
   <div class="mobile-menu" id="mobileMenu">
     <ul class="mobile-links">
       <li><a href="Whitepaper%20QOR.pdf" target="_blank">Whitepaper</a></li>
-      <li><a href="index.html">Home</a></li>
-      <li><a href="about.html">About</a></li>
-      <li><a href="ecosystem.html">Ecosystem</a></li>
-      <li><a href="tokenomics.html">Tokenomics</a></li>
-      <li><a href="security.html">Security</a></li>
-      <li><a href="blog.html" class="active">Blog</a></li>
-      <li><a href="contact.html">Contact</a></li>
+      <li><a href="/">Home</a></li>
+      <li><a href="/about">About</a></li>
+      <li><a href="/ecosystem">Ecosystem</a></li>
+      <li><a href="/tokenomics">Tokenomics</a></li>
+      <li><a href="/security">Security</a></li>
+      <li><a href="/blog" class="active">Blog</a></li>
+      <li><a href="/contact">Contact</a></li>
     </ul>
-    <a href="index.html#waitlist" class="nav-cta mobile-cta">Get Early Access</a>
+    <a href="/#waitlist" class="nav-cta mobile-cta">Get Early Access</a>
   </div>
 
   <!-- Post Content -->
@@ -99,13 +100,13 @@
     const container = document.getElementById('postContainer');
 
     if (!slug) {
-      window.location.href = 'blog.html';
+      window.location.href = '/blog';
     } else {
       fetch('admin/api/posts.php?action=get&slug=' + encodeURIComponent(slug))
         .then(r => r.json())
         .then(data => {
           if (!data.success || !data.post) {
-            container.innerHTML = '<div class="post-not-found"><h2>Post Not Found</h2><p>This article doesn\'t exist or hasn\'t been published yet.</p><a href="blog.html" class="btn-secondary" style="display:inline-block;padding:12px 28px;border:1px solid rgba(255,255,255,0.12);border-radius:100px;">Back to Blog</a></div>';
+            container.innerHTML = '<div class="post-not-found"><h2>Post Not Found</h2><p>This article doesn\'t exist or hasn\'t been published yet.</p><a href="/blog" class="btn-secondary" style="display:inline-block;padding:12px 28px;border:1px solid rgba(255,255,255,0.12);border-radius:100px;">Back to Blog</a></div>';
             return;
           }
           const p = data.post;
@@ -118,7 +119,7 @@
 
           const thumb = p.thumbnail ? p.thumbnail.replace(/^\.\.\//, '') : '';
           container.innerHTML = `
-            <div class="post-back"><a href="blog.html"><svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/></svg> Back to Blog</a></div>
+            <div class="post-back"><a href="/blog"><svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/></svg> Back to Blog</a></div>
             ${thumb ? `<img src="${thumb}" alt="${p.title}" style="width:100%;border-radius:12px;margin-bottom:24px;max-height:400px;object-fit:cover">` : ''}
             <div class="post-meta">
               <span class="post-meta-cat" style="background:${catColors[p.category] || '#4FC3F7'}20;color:${catColors[p.category] || '#4FC3F7'}">${p.category}</span>
@@ -131,7 +132,7 @@
           `;
         })
         .catch(() => {
-          container.innerHTML = '<div class="post-not-found"><h2>Error Loading Post</h2><p>Please try again later.</p><a href="blog.html" class="btn-secondary" style="display:inline-block;padding:12px 28px;border:1px solid rgba(255,255,255,0.12);border-radius:100px;">Back to Blog</a></div>';
+          container.innerHTML = '<div class="post-not-found"><h2>Error Loading Post</h2><p>Please try again later.</p><a href="/blog" class="btn-secondary" style="display:inline-block;padding:12px 28px;border:1px solid rgba(255,255,255,0.12);border-radius:100px;">Back to Blog</a></div>';
         });
     }
   </script>

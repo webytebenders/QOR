@@ -32,7 +32,7 @@ function isLoggedIn(): bool {
 
 function requireLogin(): void {
     if (!isLoggedIn()) {
-        redirect('index.php');
+        redirect('.');
     }
     secureHeaders();
 }
@@ -41,7 +41,7 @@ function requireRole(string ...$roles): void {
     requireLogin();
     if (!in_array(getCurrentAdmin()['role'], $roles)) {
         setFlash('error', 'You do not have permission to access this page.');
-        redirect('dashboard.php');
+        redirect('dashboard');
     }
 }
 

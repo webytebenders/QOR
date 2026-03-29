@@ -45,7 +45,7 @@ renderHeader('Media Library', 'media');
 ?>
 
 <div class="stats-row">
-    <a href="media.php" class="stat-widget stat-clickable <?= !$filterType && !$filterFolder ? 'stat-active' : '' ?>">
+    <a href="media" class="stat-widget stat-clickable <?= !$filterType && !$filterFolder ? 'stat-active' : '' ?>">
         <div class="stat-widget-icon blue">
             <svg viewBox="0 0 20 20" fill="currentColor" width="22" height="22"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/></svg>
         </div>
@@ -54,7 +54,7 @@ renderHeader('Media Library', 'media');
             <span class="stat-widget-label">Total Files</span>
         </div>
     </a>
-    <a href="media.php?type=image" class="stat-widget stat-clickable <?= $filterType === 'image' ? 'stat-active' : '' ?>">
+    <a href="media?type=image" class="stat-widget stat-clickable <?= $filterType === 'image' ? 'stat-active' : '' ?>">
         <div class="stat-widget-icon green">
             <svg viewBox="0 0 20 20" fill="currentColor" width="22" height="22"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/></svg>
         </div>
@@ -63,7 +63,7 @@ renderHeader('Media Library', 'media');
             <span class="stat-widget-label">Images</span>
         </div>
     </a>
-    <a href="media.php?type=document" class="stat-widget stat-clickable <?= $filterType === 'document' ? 'stat-active' : '' ?>">
+    <a href="media?type=document" class="stat-widget stat-clickable <?= $filterType === 'document' ? 'stat-active' : '' ?>">
         <div class="stat-widget-icon orange">
             <svg viewBox="0 0 20 20" fill="currentColor" width="22" height="22"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/></svg>
         </div>
@@ -95,7 +95,7 @@ renderHeader('Media Library', 'media');
         <?php if ($filterType): ?><input type="hidden" name="type" value="<?= sanitize($filterType) ?>"><?php endif; ?>
         <button type="submit" class="btn btn-secondary btn-sm">Filter</button>
         <?php if ($search || $filterFolder): ?>
-        <a href="media.php<?= $filterType ? '?type=' . urlencode($filterType) : '' ?>" class="btn btn-ghost btn-sm">Clear</a>
+        <a href="media<?= $filterType ? '?type=' . urlencode($filterType) : '' ?>" class="btn btn-ghost btn-sm">Clear</a>
         <?php endif; ?>
     </form>
     <button type="button" class="btn btn-primary" id="uploadBtn">
@@ -190,7 +190,7 @@ renderHeader('Media Library', 'media');
 </div>
 
 <script>
-const API = 'api/media.php';
+const API = 'api/media';
 const csrf = document.querySelector('[name="csrf_token"]').value;
 
 // Upload Zone Toggle

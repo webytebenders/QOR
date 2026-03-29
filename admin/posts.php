@@ -54,26 +54,26 @@ renderHeader('Blog Posts', 'blog');
 ?>
 
 <div class="stats-row">
-    <a href="posts.php" class="stat-widget stat-clickable <?= !$filterStatus ? 'stat-active' : '' ?>">
+    <a href="posts" class="stat-widget stat-clickable <?= !$filterStatus ? 'stat-active' : '' ?>">
         <div class="stat-widget-data">
             <span class="stat-widget-value"><?= $countAll ?></span>
             <span class="stat-widget-label">All Posts</span>
         </div>
     </a>
-    <a href="posts.php?status=published" class="stat-widget stat-clickable <?= $filterStatus === 'published' ? 'stat-active' : '' ?>">
+    <a href="posts?status=published" class="stat-widget stat-clickable <?= $filterStatus === 'published' ? 'stat-active' : '' ?>">
         <div class="stat-widget-icon green"><svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg></div>
         <div class="stat-widget-data">
             <span class="stat-widget-value"><?= $countPublished ?></span>
             <span class="stat-widget-label">Published</span>
         </div>
     </a>
-    <a href="posts.php?status=draft" class="stat-widget stat-clickable <?= $filterStatus === 'draft' ? 'stat-active' : '' ?>">
+    <a href="posts?status=draft" class="stat-widget stat-clickable <?= $filterStatus === 'draft' ? 'stat-active' : '' ?>">
         <div class="stat-widget-data">
             <span class="stat-widget-value"><?= $countDraft ?></span>
             <span class="stat-widget-label">Drafts</span>
         </div>
     </a>
-    <a href="posts.php?status=scheduled" class="stat-widget stat-clickable <?= $filterStatus === 'scheduled' ? 'stat-active' : '' ?>">
+    <a href="posts?status=scheduled" class="stat-widget stat-clickable <?= $filterStatus === 'scheduled' ? 'stat-active' : '' ?>">
         <div class="stat-widget-data">
             <span class="stat-widget-value"><?= $countScheduled ?></span>
             <span class="stat-widget-label">Scheduled</span>
@@ -93,7 +93,7 @@ renderHeader('Blog Posts', 'blog');
         <?php if ($filterStatus): ?><input type="hidden" name="status" value="<?= sanitize($filterStatus) ?>"><?php endif; ?>
         <button type="submit" class="btn btn-secondary btn-sm">Filter</button>
         <?php if ($search || $filterCategory): ?>
-        <a href="posts.php<?= $filterStatus ? '?status=' . $filterStatus : '' ?>" class="btn btn-ghost btn-sm">Clear</a>
+        <a href="posts<?= $filterStatus ? '?status=' . $filterStatus : '' ?>" class="btn btn-ghost btn-sm">Clear</a>
         <?php endif; ?>
     </form>
     <div style="display:flex;gap:8px;">
@@ -101,7 +101,7 @@ renderHeader('Blog Posts', 'blog');
             <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/></svg>
             Categories
         </button>
-        <a href="post-edit.php" class="btn btn-primary">
+        <a href="post-edit" class="btn btn-primary">
             <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
             New Post
         </a>
@@ -149,7 +149,7 @@ renderHeader('Blog Posts', 'blog');
                         <td>
                             <div class="post-title-cell">
                                 <?php if ($post['is_featured']): ?><span class="featured-star" title="Featured">&#9733;</span><?php endif; ?>
-                                <a href="post-edit.php?id=<?= $post['id'] ?>" class="post-link"><?= sanitize($post['title']) ?></a>
+                                <a href="post-edit?id=<?= $post['id'] ?>" class="post-link"><?= sanitize($post['title']) ?></a>
                             </div>
                         </td>
                         <td>
@@ -168,17 +168,17 @@ renderHeader('Blog Posts', 'blog');
                                     <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/></svg>
                                 </button>
                                 <div class="dropdown-menu">
-                                    <a href="post-edit.php?id=<?= $post['id'] ?>" class="dropdown-item">
+                                    <a href="post-edit?id=<?= $post['id'] ?>" class="dropdown-item">
                                         <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>
                                         Edit
                                     </a>
                                     <?php if ($post['status'] === 'published'): ?>
-                                    <a href="../blog-post.html?slug=<?= urlencode($post['slug']) ?>" target="_blank" class="dropdown-item">
+                                    <a href="/blog-post?slug=<?= urlencode($post['slug']) ?>" target="_blank" class="dropdown-item">
                                         <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg>
                                         View on Site
                                     </a>
                                     <?php endif; ?>
-                                    <form method="POST" action="api/posts.php?action=duplicate" style="display:contents">
+                                    <form method="POST" action="api/posts?action=duplicate" style="display:contents">
                                         <?= csrfField() ?>
                                         <input type="hidden" name="id" value="<?= $post['id'] ?>">
                                         <button type="submit" class="dropdown-item">
@@ -186,7 +186,7 @@ renderHeader('Blog Posts', 'blog');
                                             Duplicate
                                         </button>
                                     </form>
-                                    <form method="POST" action="api/posts.php?action=toggle_featured" style="display:contents">
+                                    <form method="POST" action="api/posts?action=toggle_featured" style="display:contents">
                                         <?= csrfField() ?>
                                         <input type="hidden" name="id" value="<?= $post['id'] ?>">
                                         <button type="submit" class="dropdown-item">
@@ -197,7 +197,7 @@ renderHeader('Blog Posts', 'blog');
                                     <div class="dropdown-divider"></div>
                                     <span class="dropdown-label">Change Status</span>
                                     <?php foreach (['draft','published','scheduled'] as $s): ?>
-                                    <form method="POST" action="api/posts.php?action=bulk_status" style="display:contents">
+                                    <form method="POST" action="api/posts?action=bulk_status" style="display:contents">
                                         <?= csrfField() ?>
                                         <input type="hidden" name="ids[]" value="<?= $post['id'] ?>">
                                         <input type="hidden" name="status" value="<?= $s ?>">
@@ -208,7 +208,7 @@ renderHeader('Blog Posts', 'blog');
                                     </form>
                                     <?php endforeach; ?>
                                     <div class="dropdown-divider"></div>
-                                    <form method="POST" action="api/posts.php?action=delete" style="display:contents" onsubmit="return confirm('Delete this post?')">
+                                    <form method="POST" action="api/posts?action=delete" style="display:contents" onsubmit="return confirm('Delete this post?')">
                                         <?= csrfField() ?>
                                         <input type="hidden" name="id" value="<?= $post['id'] ?>">
                                         <button type="submit" class="dropdown-item dropdown-item-danger">
@@ -254,7 +254,7 @@ renderHeader('Blog Posts', 'blog');
                 <button class="btn-icon" title="Edit" onclick="editCategory(<?= $cat['id'] ?>, <?= htmlspecialchars(json_encode($cat['name']), ENT_QUOTES) ?>, '<?= $cat['color'] ?>')">
                     <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>
                 </button>
-                <form method="POST" action="api/posts.php?action=delete_category" style="display:inline" onsubmit="return confirm('Delete category? Posts will be moved.')">
+                <form method="POST" action="api/posts?action=delete_category" style="display:inline" onsubmit="return confirm('Delete category? Posts will be moved.')">
                     <?= csrfField() ?>
                     <input type="hidden" name="cat_id" value="<?= $cat['id'] ?>">
                     <button type="submit" class="btn-icon" title="Delete">
@@ -265,7 +265,7 @@ renderHeader('Blog Posts', 'blog');
             <?php endforeach; ?>
 
             <!-- Add / Edit form -->
-            <form method="POST" action="api/posts.php?action=save_category" style="margin-top:16px">
+            <form method="POST" action="api/posts?action=save_category" style="margin-top:16px">
                 <?= csrfField() ?>
                 <input type="hidden" name="cat_id" id="catEditId" value="0">
                 <div style="display:flex;gap:8px;align-items:flex-end">
@@ -285,11 +285,11 @@ renderHeader('Blog Posts', 'blog');
 </div>
 
 <!-- Bulk action forms -->
-<form method="POST" action="api/posts.php?action=bulk_delete" id="bulkDeleteForm" style="display:none">
+<form method="POST" action="api/posts?action=bulk_delete" id="bulkDeleteForm" style="display:none">
     <?= csrfField() ?>
     <div id="bulkDeleteIds"></div>
 </form>
-<form method="POST" action="api/posts.php?action=bulk_status" id="bulkStatusForm" style="display:none">
+<form method="POST" action="api/posts?action=bulk_status" id="bulkStatusForm" style="display:none">
     <?= csrfField() ?>
     <div id="bulkStatusIds"></div>
     <input type="hidden" name="status" id="bulkStatusValue">

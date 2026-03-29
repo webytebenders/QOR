@@ -113,12 +113,12 @@ function callAiApiDirect(string $provider, string $apiKey, string $model, string
 // ===== Test SMTP =====
 if ($action === 'test_smtp' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = $_POST[CSRF_TOKEN_NAME] ?? '';
-    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../email.php'); }
+    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../email'); }
 
     $testEmail = sanitize($_POST['test_email'] ?? '');
     if (!filter_var($testEmail, FILTER_VALIDATE_EMAIL)) {
         setFlash('error', 'Enter a valid email address.');
-        redirect('../email.php');
+        redirect('../email');
     }
 
     $mailer = new Mailer();
@@ -136,13 +136,13 @@ if ($action === 'test_smtp' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors = implode('; ', $mailer->getErrors());
         setFlash('error', "SMTP test failed: {$errors}");
     }
-    redirect('../email.php');
+    redirect('../email');
 }
 
 // ===== Save Template =====
 if ($action === 'save_template' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = $_POST[CSRF_TOKEN_NAME] ?? '';
-    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../email.php'); }
+    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../email'); }
 
     $id = (int)($_POST['tpl_id'] ?? 0);
     $name = sanitize($_POST['tpl_name'] ?? '');
@@ -153,7 +153,7 @@ if ($action === 'save_template' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (strlen($name) < 2 || strlen($subject) < 2) {
         setFlash('error', 'Name and subject are required.');
-        redirect('../email.php');
+        redirect('../email');
     }
 
     $db = getDB();
@@ -175,13 +175,13 @@ if ($action === 'save_template' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             setFlash('error', 'A template with this name already exists.');
         }
     }
-    redirect('../email.php');
+    redirect('../email');
 }
 
 // ===== Delete Template =====
 if ($action === 'delete_template' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = $_POST[CSRF_TOKEN_NAME] ?? '';
-    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../email.php'); }
+    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../email'); }
 
     $id = (int)($_POST['tpl_id'] ?? 0);
     if ($id) {
@@ -190,13 +190,13 @@ if ($action === 'delete_template' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         logActivity($_SESSION['admin_id'], 'delete_email_template', 'email_template', $id);
         setFlash('success', 'Template deleted.');
     }
-    redirect('../email.php');
+    redirect('../email');
 }
 
 // ===== Toggle Template Active =====
 if ($action === 'toggle_template' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = $_POST[CSRF_TOKEN_NAME] ?? '';
-    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../email.php'); }
+    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../email'); }
 
     $id = (int)($_POST['tpl_id'] ?? 0);
     if ($id) {
@@ -205,7 +205,7 @@ if ($action === 'toggle_template' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         logActivity($_SESSION['admin_id'], 'toggle_email_template', 'email_template', $id);
         setFlash('success', 'Template status toggled.');
     }
-    redirect('../email.php');
+    redirect('../email');
 }
 
 // ===== Preview Template =====
@@ -236,10 +236,10 @@ if ($action === 'preview_template' && $_SERVER['REQUEST_METHOD'] === 'GET') {
 // ===== Send Campaign (queue-based) =====
 if ($action === 'send_campaign' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = $_POST[CSRF_TOKEN_NAME] ?? '';
-    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../newsletter.php?tab=campaigns'); }
+    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../newsletter?tab=campaigns'); }
 
     $campaignId = (int)($_POST['campaign_id'] ?? 0);
-    if (!$campaignId) { setFlash('error', 'Invalid campaign.'); redirect('../newsletter.php?tab=campaigns'); }
+    if (!$campaignId) { setFlash('error', 'Invalid campaign.'); redirect('../newsletter?tab=campaigns'); }
 
     $db = getDB();
     try { $db->exec(file_get_contents(__DIR__ . '/../includes/schema_subscribers.sql')); } catch (Exception $e) {}
@@ -248,11 +248,11 @@ if ($action === 'send_campaign' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute([$campaignId]);
     $campaign = $stmt->fetch();
 
-    if (!$campaign) { setFlash('error', 'Campaign not found.'); redirect('../newsletter.php?tab=campaigns'); }
-    if ($campaign['status'] === 'sent' || $campaign['status'] === 'sending') { setFlash('error', 'Campaign already sent/sending.'); redirect('../newsletter.php?tab=campaigns'); }
+    if (!$campaign) { setFlash('error', 'Campaign not found.'); redirect('../newsletter?tab=campaigns'); }
+    if ($campaign['status'] === 'sent' || $campaign['status'] === 'sending') { setFlash('error', 'Campaign already sent/sending.'); redirect('../newsletter?tab=campaigns'); }
 
     $subscribers = getCampaignSubscribers($db, $campaign);
-    if (empty($subscribers)) { setFlash('error', 'No subscribers match this audience.'); redirect('../newsletter.php?tab=campaigns'); }
+    if (empty($subscribers)) { setFlash('error', 'No subscribers match this audience.'); redirect('../newsletter?tab=campaigns'); }
 
     // Queue all subscribers
     $queueStmt = $db->prepare('INSERT INTO campaign_send_queue (campaign_id, subscriber_id, email, unsubscribe_token) VALUES (?, ?, ?, ?)');
@@ -269,7 +269,7 @@ if ($action === 'send_campaign' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     logActivity($_SESSION['admin_id'], 'queue_campaign', 'campaign', $campaignId, ['queued' => $queued]);
     setFlash('success', "{$queued} emails queued for sending. Processing will begin automatically.");
-    redirect('../newsletter.php?tab=campaigns');
+    redirect('../newsletter?tab=campaigns');
 }
 
 // ===== Cron: Process Send Queue =====
@@ -314,7 +314,7 @@ if ($action === 'process_queue') {
     $mailer = new Mailer();
     $sent = 0;
     $failed = 0;
-    $trackBase = rtrim(APP_URL, '/') . '/admin/api/track.php';
+    $trackBase = rtrim(APP_URL, '/') . '/admin/api/track';
 
     foreach ($pending as $item) {
         // Convert blocks JSON to HTML if needed
@@ -323,7 +323,7 @@ if ($action === 'process_queue') {
         if (is_array($decoded)) $emailContent = blocksToEmailHtml($decoded);
 
         $personalHtml = getEmailWrapper($emailContent, '{{unsubscribe_url}}');
-        $unsubUrl = rtrim(APP_URL, '/') . '/admin/api/newsletter.php?action=unsubscribe&token=' . $item['unsubscribe_token'];
+        $unsubUrl = rtrim(APP_URL, '/') . '/admin/api/newsletter?action=unsubscribe&token=' . $item['unsubscribe_token'];
         $personalHtml = str_replace(['{{unsubscribe_url}}', '{{email}}'], [$unsubUrl, $item['email']], $personalHtml);
 
         // Open tracking pixel

@@ -56,7 +56,7 @@ if (isPost()) {
                     <input type="email" id="email" name="email" placeholder="admin@corechain.io" required autofocus>
                 </div>
                 <button type="submit" class="btn btn-primary btn-full">Send Reset Link</button>
-                <a href="index.php" class="login-link">Back to Login</a>
+                <a href="." class="login-link">Back to Login</a>
             </form>
         </div>
     </div>

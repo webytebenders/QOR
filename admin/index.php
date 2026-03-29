@@ -5,12 +5,12 @@ startSecureSession();
 
 // Redirect to setup if first run
 if (isFirstRun()) {
-    redirect('setup.php');
+    redirect('setup');
 }
 
 // Already logged in
 if (isLoggedIn()) {
-    redirect('dashboard.php');
+    redirect('dashboard');
 }
 
 $error = '';
@@ -33,7 +33,7 @@ if (isPost()) {
                 $admin = $stmt->fetch();
                 unset($_SESSION['pending_2fa_admin_id']);
                 completeLogin($admin);
-                redirect('dashboard.php');
+                redirect('dashboard');
             } else {
                 $error = 'Invalid 2FA code. Please try again.';
                 $requires2fa = true;
@@ -46,7 +46,7 @@ if (isPost()) {
             $result = attemptLogin($email, $password);
 
             if ($result['success']) {
-                redirect('dashboard.php');
+                redirect('dashboard');
             } elseif (!empty($result['requires_2fa'])) {
                 $requires2fa = true;
             } else {
@@ -93,7 +93,7 @@ if (isset($_SESSION['pending_2fa_admin_id'])) {
                     <input type="text" id="totp_code" name="totp_code" placeholder="Enter 6-digit code" maxlength="6" pattern="[0-9]{6}" required autofocus autocomplete="one-time-code">
                 </div>
                 <button type="submit" class="btn btn-primary btn-full">Verify</button>
-                <a href="index.php" class="login-link">Back to Login</a>
+                <a href="." class="login-link">Back to Login</a>
             </form>
             <?php else: ?>
             <form method="POST" class="login-form">
@@ -107,7 +107,7 @@ if (isset($_SESSION['pending_2fa_admin_id'])) {
                     <input type="password" id="password" name="password" placeholder="Enter your password" required>
                 </div>
                 <button type="submit" class="btn btn-primary btn-full">Sign In</button>
-                <a href="forgot-password.php" class="login-link">Forgot password?</a>
+                <a href="forgot-password" class="login-link">Forgot password?</a>
             </form>
             <?php endif; ?>
         </div>

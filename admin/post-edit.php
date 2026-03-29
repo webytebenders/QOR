@@ -20,7 +20,7 @@ if ($id) {
     $post = $stmt->fetch();
     if (!$post) {
         setFlash('error', 'Post not found.');
-        redirect('posts.php');
+        redirect('posts');
     }
 }
 
@@ -33,19 +33,19 @@ renderHeader($pageTitle, 'blog');
 ?>
 
 <div class="msg-back">
-    <a href="posts.php" class="btn btn-ghost btn-sm">
+    <a href="posts" class="btn btn-ghost btn-sm">
         <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/></svg>
         Back to Posts
     </a>
     <?php if ($post && $post['status'] === 'published'): ?>
-    <a href="../blog-post.html?slug=<?= urlencode($post['slug']) ?>" target="_blank" class="btn btn-secondary btn-sm">
+    <a href="/blog-post?slug=<?= urlencode($post['slug']) ?>" target="_blank" class="btn btn-secondary btn-sm">
         <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg>
         View on Site
     </a>
     <?php endif; ?>
 </div>
 
-<form method="POST" action="api/posts.php?action=save" class="post-editor">
+<form method="POST" action="api/posts?action=save" class="post-editor">
     <?= csrfField() ?>
     <?php if ($post): ?><input type="hidden" name="id" value="<?= $post['id'] ?>"><?php endif; ?>
 
@@ -255,7 +255,7 @@ document.querySelector('.post-editor').addEventListener('submit', syncContent);
 // Media Picker
 function openMediaPicker() {
     document.getElementById('mediaPickerModal').classList.add('show');
-    fetch('api/posts.php?action=media_list')
+    fetch('api/posts?action=media_list')
         .then(r => r.json())
         .then(data => {
             const grid = document.getElementById('mediaPickerGrid');

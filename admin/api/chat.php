@@ -271,7 +271,7 @@ if ($action === 'deploy_widget') {
 
     logActivity($_SESSION['admin_id'], 'deploy_widget', 'chatbot', null, ['pages' => $injected]);
     setFlash('success', "Chat widget deployed to {$injected} page(s).");
-    redirect('../chatbot.php?tab=settings');
+    redirect('../chatbot?tab=settings');
 }
 
 jsonResponse(['error' => 'Invalid action.'], 400);

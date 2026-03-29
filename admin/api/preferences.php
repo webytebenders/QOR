@@ -133,7 +133,7 @@ $topicLabels = [
         <div class="success">Preferences saved!</div>
         <?php endif; ?>
 
-        <form method="POST" action="preferences.php?action=save&token=<?= urlencode($token) ?>">
+        <form method="POST" action="preferences?action=save&token=<?= urlencode($token) ?>">
             <div class="card">
                 <h2>Your Details</h2>
                 <div class="form-group">
@@ -188,7 +188,7 @@ $topicLabels = [
         <div class="card">
             <h2 style="color:#ef4444;">Unsubscribe</h2>
             <p class="info" style="margin-bottom:16px;">We'd hate to see you go. If you unsubscribe, you'll stop receiving all emails from us.</p>
-            <form method="POST" action="preferences.php?action=unsubscribe&token=<?= urlencode($token) ?>" onsubmit="return confirm('Are you sure you want to unsubscribe?')">
+            <form method="POST" action="preferences?action=unsubscribe&token=<?= urlencode($token) ?>" onsubmit="return confirm('Are you sure you want to unsubscribe?')">
                 <div class="unsub-reasons">
                     <label><input type="radio" name="reason" value="too_many" checked> Too many emails</label>
                     <label><input type="radio" name="reason" value="not_relevant"> Content not relevant to me</label>

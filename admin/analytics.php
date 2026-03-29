@@ -33,7 +33,7 @@ if (isPost() && ($_GET['action'] ?? '') === 'save_goal') {
             setFlash('success', 'Goal saved.');
         }
     }
-    redirect('analytics.php?tab=goals&range=' . $range);
+    redirect('analytics?tab=goals&range=' . $range);
 }
 
 if (($_GET['action'] ?? '') === 'delete_goal') {
@@ -44,13 +44,13 @@ if (($_GET['action'] ?? '') === 'delete_goal') {
         logActivity($_SESSION['admin_id'], 'delete_goal', 'analytics', $id);
         setFlash('success', 'Goal deleted.');
     }
-    redirect('analytics.php?tab=goals&range=' . $range);
+    redirect('analytics?tab=goals&range=' . $range);
 }
 
 if (($_GET['action'] ?? '') === 'toggle_goal') {
     $id = (int)($_GET['id'] ?? 0);
     if ($id) { $db->prepare('UPDATE analytics_goals SET is_active = NOT is_active WHERE id = ?')->execute([$id]); }
-    redirect('analytics.php?tab=goals&range=' . $range);
+    redirect('analytics?tab=goals&range=' . $range);
 }
 
 // Fetch goals for the goals tab
@@ -107,13 +107,13 @@ renderHeader('Analytics', 'analytics');
 
 <div class="filters-bar" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
     <div class="filters-form">
-        <a href="analytics.php?tab=<?= $tab ?>&range=1" class="btn <?= $range === '1' ? 'btn-primary' : 'btn-secondary' ?> btn-sm">Today</a>
-        <a href="analytics.php?tab=<?= $tab ?>&range=7" class="btn <?= $range === '7' ? 'btn-primary' : 'btn-secondary' ?> btn-sm">7 Days</a>
-        <a href="analytics.php?tab=<?= $tab ?>&range=30" class="btn <?= $range === '30' ? 'btn-primary' : 'btn-secondary' ?> btn-sm">30 Days</a>
-        <a href="analytics.php?tab=<?= $tab ?>&range=90" class="btn <?= $range === '90' ? 'btn-primary' : 'btn-secondary' ?> btn-sm">90 Days</a>
+        <a href="analytics?tab=<?= $tab ?>&range=1" class="btn <?= $range === '1' ? 'btn-primary' : 'btn-secondary' ?> btn-sm">Today</a>
+        <a href="analytics?tab=<?= $tab ?>&range=7" class="btn <?= $range === '7' ? 'btn-primary' : 'btn-secondary' ?> btn-sm">7 Days</a>
+        <a href="analytics?tab=<?= $tab ?>&range=30" class="btn <?= $range === '30' ? 'btn-primary' : 'btn-secondary' ?> btn-sm">30 Days</a>
+        <a href="analytics?tab=<?= $tab ?>&range=90" class="btn <?= $range === '90' ? 'btn-primary' : 'btn-secondary' ?> btn-sm">90 Days</a>
     </div>
     <div style="display:flex;align-items:center;gap:12px;">
-        <a href="api/analytics.php?action=export_csv&range=<?= $range ?>" class="btn btn-secondary btn-sm">
+        <a href="api/analytics?action=export_csv&range=<?= $range ?>" class="btn btn-secondary btn-sm">
             <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
             Export CSV
         </a>
@@ -135,15 +135,15 @@ renderHeader('Analytics', 'analytics');
 </div>
 
 <div class="tabs">
-    <a href="analytics.php?tab=overview&range=<?= $range ?>" class="tab <?= $tab === 'overview' ? 'tab-active' : '' ?>">Overview</a>
-    <a href="analytics.php?tab=realtime&range=<?= $range ?>" class="tab <?= $tab === 'realtime' ? 'tab-active' : '' ?>">Real-Time</a>
-    <a href="analytics.php?tab=events&range=<?= $range ?>" class="tab <?= $tab === 'events' ? 'tab-active' : '' ?>">Events</a>
-    <a href="analytics.php?tab=campaigns&range=<?= $range ?>" class="tab <?= $tab === 'campaigns' ? 'tab-active' : '' ?>">Campaigns</a>
-    <a href="analytics.php?tab=goals&range=<?= $range ?>" class="tab <?= $tab === 'goals' ? 'tab-active' : '' ?>">Goals</a>
-    <a href="analytics.php?tab=conversions&range=<?= $range ?>" class="tab <?= $tab === 'conversions' ? 'tab-active' : '' ?>">Conversions</a>
-    <a href="analytics.php?tab=geo&range=<?= $range ?>" class="tab <?= $tab === 'geo' ? 'tab-active' : '' ?>">Geography</a>
-    <a href="analytics.php?tab=performance&range=<?= $range ?>" class="tab <?= $tab === 'performance' ? 'tab-active' : '' ?>">Performance</a>
-    <a href="analytics.php?tab=comparison&range=<?= $range ?>" class="tab <?= $tab === 'comparison' ? 'tab-active' : '' ?>">Comparison</a>
+    <a href="analytics?tab=overview&range=<?= $range ?>" class="tab <?= $tab === 'overview' ? 'tab-active' : '' ?>">Overview</a>
+    <a href="analytics?tab=realtime&range=<?= $range ?>" class="tab <?= $tab === 'realtime' ? 'tab-active' : '' ?>">Real-Time</a>
+    <a href="analytics?tab=events&range=<?= $range ?>" class="tab <?= $tab === 'events' ? 'tab-active' : '' ?>">Events</a>
+    <a href="analytics?tab=campaigns&range=<?= $range ?>" class="tab <?= $tab === 'campaigns' ? 'tab-active' : '' ?>">Campaigns</a>
+    <a href="analytics?tab=goals&range=<?= $range ?>" class="tab <?= $tab === 'goals' ? 'tab-active' : '' ?>">Goals</a>
+    <a href="analytics?tab=conversions&range=<?= $range ?>" class="tab <?= $tab === 'conversions' ? 'tab-active' : '' ?>">Conversions</a>
+    <a href="analytics?tab=geo&range=<?= $range ?>" class="tab <?= $tab === 'geo' ? 'tab-active' : '' ?>">Geography</a>
+    <a href="analytics?tab=performance&range=<?= $range ?>" class="tab <?= $tab === 'performance' ? 'tab-active' : '' ?>">Performance</a>
+    <a href="analytics?tab=comparison&range=<?= $range ?>" class="tab <?= $tab === 'comparison' ? 'tab-active' : '' ?>">Comparison</a>
 </div>
 
 <?php if ($tab === 'overview'): ?>
@@ -290,7 +290,7 @@ renderHeader('Analytics', 'analytics');
     <div class="card-body">
         <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:12px;">Use this JavaScript to track custom events:</p>
         <pre style="background:var(--bg-secondary);padding:16px;border-radius:8px;font-size:0.8rem;overflow-x:auto;"><code>// Track a custom event
-fetch('<?= APP_URL ?>/admin/api/analytics.php?action=event', {
+fetch('<?= APP_URL ?>/admin/api/analytics?action=event', {
   method: 'POST',
   headers: {'Content-Type': 'application/json'},
   body: JSON.stringify({
@@ -399,7 +399,7 @@ function buildUtm() {
 <div class="card" style="margin-bottom:20px;">
     <div class="card-header"><h2><?= $editGoal ? 'Edit' : 'Create' ?> Goal</h2></div>
     <div class="card-body">
-        <form method="POST" action="analytics.php?action=save_goal&tab=goals&range=<?= $range ?>">
+        <form method="POST" action="analytics?action=save_goal&tab=goals&range=<?= $range ?>">
             <?= csrfField() ?>
             <?php if ($editGoal): ?>
             <input type="hidden" name="id" value="<?= $editGoal['id'] ?>">
@@ -419,7 +419,7 @@ function buildUtm() {
                 </div>
                 <div class="form-group" style="margin:0;">
                     <label>Target <small style="color:var(--text-muted);">(path, event name, or seconds)</small></label>
-                    <input type="text" name="goal_target" value="<?= sanitize($editGoal['goal_target'] ?? '') ?>" placeholder="/contact.html or waitlist_signup" required>
+                    <input type="text" name="goal_target" value="<?= sanitize($editGoal['goal_target'] ?? '') ?>" placeholder="/contact or waitlist_signup" required>
                 </div>
             </div>
             <div class="form-group">
@@ -428,7 +428,7 @@ function buildUtm() {
             </div>
             <div style="display:flex;gap:8px;">
                 <button type="submit" class="btn btn-primary"><?= $editGoal ? 'Update' : 'Create' ?> Goal</button>
-                <?php if ($editGoal): ?><a href="analytics.php?tab=goals&range=<?= $range ?>" class="btn btn-ghost">Cancel</a><?php endif; ?>
+                <?php if ($editGoal): ?><a href="analytics?tab=goals&range=<?= $range ?>" class="btn btn-ghost">Cancel</a><?php endif; ?>
             </div>
         </form>
     </div>
@@ -450,9 +450,9 @@ function buildUtm() {
                         <td><strong style="font-size:1.1rem;"><?= number_format($goalConversions[$g['id']] ?? 0) ?></strong></td>
                         <td><?= $g['is_active'] ? '<span class="badge-green">Active</span>' : '<span class="badge-gray">Disabled</span>' ?></td>
                         <td style="white-space:nowrap;">
-                            <a href="analytics.php?tab=goals&range=<?= $range ?>&edit_goal=<?= $g['id'] ?>" class="btn btn-secondary btn-sm">Edit</a>
-                            <a href="analytics.php?action=toggle_goal&id=<?= $g['id'] ?>&range=<?= $range ?>" class="btn btn-secondary btn-sm"><?= $g['is_active'] ? 'Disable' : 'Enable' ?></a>
-                            <a href="analytics.php?action=delete_goal&id=<?= $g['id'] ?>&range=<?= $range ?>" class="btn btn-danger btn-sm" onclick="return confirm('Delete this goal?')">Del</a>
+                            <a href="analytics?tab=goals&range=<?= $range ?>&edit_goal=<?= $g['id'] ?>" class="btn btn-secondary btn-sm">Edit</a>
+                            <a href="analytics?action=toggle_goal&id=<?= $g['id'] ?>&range=<?= $range ?>" class="btn btn-secondary btn-sm"><?= $g['is_active'] ? 'Disable' : 'Enable' ?></a>
+                            <a href="analytics?action=delete_goal&id=<?= $g['id'] ?>&range=<?= $range ?>" class="btn btn-danger btn-sm" onclick="return confirm('Delete this goal?')">Del</a>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -524,7 +524,7 @@ function buildUtm() {
 
 <script>
 const range = <?= (int)$range ?>;
-const API = 'api/analytics.php';
+const API = 'api/analytics';
 
 function renderBar(label, value, max, color) {
     const pct = max > 0 ? (value / max * 100) : 0;

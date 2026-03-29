@@ -165,7 +165,7 @@ class Mailer {
     private function personalizeTemplate(string $template, array $data): string {
         $replacements = [
             '{{email}}' => $data['email'] ?? '',
-            '{{unsubscribe_url}}' => ADMIN_URL . '/api/newsletter.php?action=unsubscribe&token=' . ($data['unsubscribe_token'] ?? ''),
+            '{{unsubscribe_url}}' => ADMIN_URL . '/api/newsletter?action=unsubscribe&token=' . ($data['unsubscribe_token'] ?? ''),
         ];
         return str_replace(array_keys($replacements), array_values($replacements), $template);
     }
@@ -231,7 +231,7 @@ function getTemplateSubject(string $slug, array $vars = []): string {
 
 function getEmailWrapper(string $content, string $unsubscribeUrl = ''): string {
     // Build preference link from unsubscribe URL (swap endpoint)
-    $prefsUrl = str_replace('newsletter.php?action=unsubscribe&token=', 'preferences.php?token=', $unsubscribeUrl);
+    $prefsUrl = str_replace('newsletter?action=unsubscribe&token=', 'preferences?token=', $unsubscribeUrl);
     $unsub = $unsubscribeUrl ? '<p style="margin-top:30px;padding-top:20px;border-top:1px solid #222;font-size:12px;color:#666;"><a href="' . $prefsUrl . '" style="color:#4FC3F7;">Manage Preferences</a> &middot; <a href="' . $unsubscribeUrl . '" style="color:#666;">Unsubscribe</a></p>' : '';
 
     return '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>

@@ -87,7 +87,7 @@ renderHeader('Waitlist', 'waitlist');
 
 <!-- Stats -->
 <div class="stats-row">
-    <a href="waitlist.php" class="stat-widget stat-clickable <?= !$status ? 'stat-active' : '' ?>">
+    <a href="waitlist" class="stat-widget stat-clickable <?= !$status ? 'stat-active' : '' ?>">
         <div class="stat-widget-icon blue">
             <svg viewBox="0 0 20 20" fill="currentColor" width="22" height="22"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>
         </div>
@@ -127,7 +127,7 @@ renderHeader('Waitlist', 'waitlist');
 
 <!-- Status Filter Pills -->
 <div class="status-pills">
-    <a href="waitlist.php" class="status-pill <?= !$status ? 'active' : '' ?>">All <span class="pill-count"><?= $totalAll ?></span></a>
+    <a href="waitlist" class="status-pill <?= !$status ? 'active' : '' ?>">All <span class="pill-count"><?= $totalAll ?></span></a>
     <a href="?status=new" class="status-pill pill-new <?= $status === 'new' ? 'active' : '' ?>">New <span class="pill-count"><?= $statusCounts['new'] ?? 0 ?></span></a>
     <a href="?status=contacted" class="status-pill pill-contacted <?= $status === 'contacted' ? 'active' : '' ?>">Contacted <span class="pill-count"><?= $statusCounts['contacted'] ?? 0 ?></span></a>
     <a href="?status=qualified" class="status-pill pill-qualified <?= $status === 'qualified' ? 'active' : '' ?>">Qualified <span class="pill-count"><?= $statusCounts['qualified'] ?? 0 ?></span></a>
@@ -150,11 +150,11 @@ renderHeader('Waitlist', 'waitlist');
         <input type="date" name="to" value="<?= sanitize($dateTo) ?>" class="filter-input filter-date" placeholder="To">
         <button type="submit" class="btn btn-secondary btn-sm">Filter</button>
         <?php if ($search || $source || $dateFrom || $dateTo || $status): ?>
-        <a href="waitlist.php" class="btn btn-ghost btn-sm">Clear</a>
+        <a href="waitlist" class="btn btn-ghost btn-sm">Clear</a>
         <?php endif; ?>
     </form>
     <div class="filters-actions">
-        <a href="api/waitlist.php?action=export&search=<?= urlencode($search) ?>&source=<?= urlencode($source) ?>&status=<?= urlencode($status) ?>" class="btn btn-secondary btn-sm">
+        <a href="api/waitlist?action=export&search=<?= urlencode($search) ?>&source=<?= urlencode($source) ?>&status=<?= urlencode($status) ?>" class="btn btn-secondary btn-sm">
             <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
             Export CSV
         </a>
@@ -230,7 +230,7 @@ renderHeader('Waitlist', 'waitlist');
                                     <div class="dropdown-divider"></div>
                                     <span class="dropdown-label">Change Status</span>
                                     <?php foreach (['new','contacted','qualified','ready','converted'] as $s): ?>
-                                    <form method="POST" action="api/waitlist.php?action=update_status" style="display:contents">
+                                    <form method="POST" action="api/waitlist?action=update_status" style="display:contents">
                                         <?= csrfField() ?>
                                         <input type="hidden" name="id" value="<?= $entry['id'] ?>">
                                         <input type="hidden" name="status" value="<?= $s ?>">
@@ -240,7 +240,7 @@ renderHeader('Waitlist', 'waitlist');
                                     </form>
                                     <?php endforeach; ?>
                                     <div class="dropdown-divider"></div>
-                                    <form method="POST" action="api/waitlist.php?action=resend_email" style="display:contents">
+                                    <form method="POST" action="api/waitlist?action=resend_email" style="display:contents">
                                         <?= csrfField() ?>
                                         <input type="hidden" name="id" value="<?= $entry['id'] ?>">
                                         <button type="submit" class="dropdown-item">
@@ -249,7 +249,7 @@ renderHeader('Waitlist', 'waitlist');
                                         </button>
                                     </form>
                                     <div class="dropdown-divider"></div>
-                                    <form method="POST" action="api/waitlist.php?action=delete" style="display:contents" onsubmit="return confirm('Delete this entry?')">
+                                    <form method="POST" action="api/waitlist?action=delete" style="display:contents" onsubmit="return confirm('Delete this entry?')">
                                         <?= csrfField() ?>
                                         <input type="hidden" name="id" value="<?= $entry['id'] ?>">
                                         <button type="submit" class="dropdown-item dropdown-item-danger">
@@ -303,11 +303,11 @@ renderHeader('Waitlist', 'waitlist');
 </div>
 
 <!-- Hidden forms for bulk actions -->
-<form method="POST" action="api/waitlist.php?action=bulk_delete" id="bulkDeleteForm" style="display:none">
+<form method="POST" action="api/waitlist?action=bulk_delete" id="bulkDeleteForm" style="display:none">
     <?= csrfField() ?>
     <div id="bulkDeleteIds"></div>
 </form>
-<form method="POST" action="api/waitlist.php?action=bulk_status" id="bulkStatusForm" style="display:none">
+<form method="POST" action="api/waitlist?action=bulk_status" id="bulkStatusForm" style="display:none">
     <?= csrfField() ?>
     <div id="bulkStatusIds"></div>
     <input type="hidden" name="status" id="bulkStatusValue">
@@ -405,7 +405,7 @@ function saveNotes() {
     body.append('notes', notes);
     body.append('<?= CSRF_TOKEN_NAME ?>', csrf);
 
-    fetch('api/waitlist.php?action=save_notes', { method: 'POST', body })
+    fetch('api/waitlist?action=save_notes', { method: 'POST', body })
         .then(r => r.json())
         .then(data => {
             if (data.success) {

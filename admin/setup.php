@@ -108,7 +108,7 @@ if ($step === '1' && isPost()) {
 
             file_put_contents(__DIR__ . '/includes/config.php', $configContent);
 
-            redirect('setup.php?step=2');
+            redirect('setup?step=2');
         } catch (PDOException $e) {
             $error = 'Database connection failed: ' . $e->getMessage();
         }
@@ -142,7 +142,7 @@ if ($step === '2' && isPost()) {
             $stmt = $db->prepare('INSERT INTO admins (name, email, password, role, created_at) VALUES (?, ?, ?, ?, NOW())');
             $stmt->execute([$name, $email, $hash, 'super_admin']);
 
-            redirect('setup.php?step=3');
+            redirect('setup?step=3');
         }
     }
 }
@@ -232,7 +232,7 @@ if ($step === '2' && isPost()) {
                 </div>
                 <h2>Setup Complete!</h2>
                 <p>Your Core Chain admin panel is ready. You can now log in with your admin credentials.</p>
-                <a href="index.php" class="btn btn-primary btn-full">Go to Login</a>
+                <a href="." class="btn btn-primary btn-full">Go to Login</a>
             </div>
             <?php endif; ?>
         </div>

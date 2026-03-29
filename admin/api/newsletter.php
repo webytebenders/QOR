@@ -59,7 +59,7 @@ if ($action === 'subscribe' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             require_once '../includes/mailer.php';
             $mailer = new Mailer();
-            $unsubUrl = ADMIN_URL . '/api/newsletter.php?action=unsubscribe&token=' . $token;
+            $unsubUrl = ADMIN_URL . '/api/newsletter?action=unsubscribe&token=' . $token;
             $mailer->send($email, 'Welcome to Core Chain Newsletter', getSubscriberWelcomeEmail($unsubUrl));
         } catch (Exception $e) { /* silently fail */ }
 
@@ -136,7 +136,7 @@ if ($action === 'delete_sub' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     require_once '../includes/auth.php';
     startSecureSession(); requireLogin();
     $token = $_POST[CSRF_TOKEN_NAME] ?? '';
-    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../newsletter.php'); }
+    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../newsletter'); }
 
     $id = (int)($_POST['id'] ?? 0);
     if ($id) {
@@ -146,7 +146,7 @@ if ($action === 'delete_sub' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         logActivity($_SESSION['admin_id'], 'delete_subscriber', 'subscriber', $id);
         setFlash('success', 'Subscriber removed.');
     }
-    redirect('../newsletter.php');
+    redirect('../newsletter');
 }
 
 // ===== ADMIN: Save Campaign =====
@@ -154,7 +154,7 @@ if ($action === 'save_campaign' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     require_once '../includes/auth.php';
     startSecureSession(); requireRole('super_admin', 'editor');
     $token = $_POST[CSRF_TOKEN_NAME] ?? '';
-    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../newsletter.php?tab=campaigns'); }
+    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../newsletter?tab=campaigns'); }
 
     $id = (int)($_POST['id'] ?? 0);
     $subject = sanitize($_POST['subject'] ?? '');
@@ -166,7 +166,7 @@ if ($action === 'save_campaign' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($audienceType === 'segment') $audienceId = (int)($_POST['audience_segment_id'] ?? 0) ?: null;
     if ($audienceType === 'tag') $audienceId = (int)($_POST['audience_tag_id'] ?? 0) ?: null;
 
-    if (strlen($subject) < 3) { setFlash('error', 'Subject must be at least 3 characters.'); redirect('../campaign-edit.php' . ($id ? '?id=' . $id : '')); }
+    if (strlen($subject) < 3) { setFlash('error', 'Subject must be at least 3 characters.'); redirect('../campaign-edit' . ($id ? '?id=' . $id : '')); }
 
     $validStatuses = ['draft', 'scheduled'];
     if (!in_array($status, $validStatuses)) $status = 'draft';
@@ -187,7 +187,7 @@ if ($action === 'save_campaign' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         logActivity($admin['id'], 'create_campaign', 'campaign', $db->lastInsertId(), ['subject' => $subject]);
         setFlash('success', 'Campaign created.');
     }
-    redirect('../newsletter.php?tab=campaigns');
+    redirect('../newsletter?tab=campaigns');
 }
 
 // ===== ADMIN: Delete Campaign =====
@@ -195,7 +195,7 @@ if ($action === 'delete_campaign' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     require_once '../includes/auth.php';
     startSecureSession(); requireRole('super_admin', 'editor');
     $token = $_POST[CSRF_TOKEN_NAME] ?? '';
-    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../newsletter.php?tab=campaigns'); }
+    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../newsletter?tab=campaigns'); }
 
     $id = (int)($_POST['id'] ?? 0);
     if ($id) {
@@ -205,7 +205,7 @@ if ($action === 'delete_campaign' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         logActivity($_SESSION['admin_id'], 'delete_campaign', 'campaign', $id);
         setFlash('success', 'Campaign deleted.');
     }
-    redirect('../newsletter.php?tab=campaigns');
+    redirect('../newsletter?tab=campaigns');
 }
 
 // ===== ADMIN: Import Waitlist to Newsletter =====
@@ -215,7 +215,7 @@ if ($action === 'import_waitlist' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     requireRole('super_admin');
 
     $token = $_POST[CSRF_TOKEN_NAME] ?? '';
-    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../newsletter.php'); }
+    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../newsletter'); }
 
     $db = getDB();
 
@@ -225,7 +225,7 @@ if ($action === 'import_waitlist' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($newEmails)) {
         setFlash('info', 'All waitlist members are already subscribed to the newsletter.');
-        redirect('../newsletter.php');
+        redirect('../newsletter');
     }
 
     $imported = 0;
@@ -244,7 +244,7 @@ if ($action === 'import_waitlist' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     require_once '../includes/logger.php';
     logActivity($_SESSION['admin_id'], 'import_waitlist_to_newsletter', 'subscriber', null, ['count' => $imported]);
     setFlash('success', "{$imported} waitlist members imported to newsletter subscribers.");
-    redirect('../newsletter.php');
+    redirect('../newsletter');
 }
 
 // ===== ADMIN: Send Campaign =====
@@ -252,7 +252,7 @@ if ($action === 'send_campaign' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     // Handled by api/email.php?action=send_campaign
     require_once '../includes/auth.php';
     startSecureSession(); requireRole('super_admin');
-    redirect('../newsletter.php?tab=campaigns');
+    redirect('../newsletter?tab=campaigns');
 }
 
 // ===== ADMIN: Import CSV =====
@@ -377,7 +377,7 @@ if ($action === 'process_automations') {
     $sent = 0;
 
     foreach ($ready as $item) {
-        $unsubUrl = rtrim(APP_URL, '/') . '/admin/api/newsletter.php?action=unsubscribe&token=' . $item['unsubscribe_token'];
+        $unsubUrl = rtrim(APP_URL, '/') . '/admin/api/newsletter?action=unsubscribe&token=' . $item['unsubscribe_token'];
         $html = getEmailWrapper($item['content'], $unsubUrl);
         $html = str_replace('{{email}}', $item['email'], $html);
 

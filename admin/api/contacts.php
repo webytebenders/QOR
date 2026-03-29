@@ -93,7 +93,7 @@ if ($action === 'update_status' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = $_POST[CSRF_TOKEN_NAME] ?? '';
     if (!validateCSRF($token)) {
         setFlash('error', 'Invalid request.');
-        redirect('../messages.php');
+        redirect('../messages');
     }
 
     $id = (int)($_POST['id'] ?? 0);
@@ -108,7 +108,7 @@ if ($action === 'update_status' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         require_once '../includes/logger.php';
         logActivity($_SESSION['admin_id'], 'update_contact_status', 'contact', $id, ['status' => $status]);
     }
-    redirect('../messages.php' . (isset($_GET['view']) ? '?view=' . $id : ''));
+    redirect('../messages' . (isset($_GET['view']) ? '?view=' . $id : ''));
 }
 
 // ===== ADMIN: Reply =====
@@ -120,7 +120,7 @@ if ($action === 'reply' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = $_POST[CSRF_TOKEN_NAME] ?? '';
     if (!validateCSRF($token)) {
         setFlash('error', 'Invalid request.');
-        redirect('../messages.php');
+        redirect('../messages');
     }
 
     $id = (int)($_POST['id'] ?? 0);
@@ -147,7 +147,7 @@ if ($action === 'reply' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         logActivity($_SESSION['admin_id'], 'reply_contact', 'contact', $id);
         setFlash('success', 'Reply sent successfully.');
     }
-    redirect('../messages.php?view=' . $id);
+    redirect('../messages?view=' . $id);
 }
 
 // ===== ADMIN: Delete =====
@@ -159,7 +159,7 @@ if ($action === 'delete' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = $_POST[CSRF_TOKEN_NAME] ?? '';
     if (!validateCSRF($token)) {
         setFlash('error', 'Invalid request.');
-        redirect('../messages.php');
+        redirect('../messages');
     }
 
     $id = (int)($_POST['id'] ?? 0);
@@ -172,7 +172,7 @@ if ($action === 'delete' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         logActivity($_SESSION['admin_id'], 'delete_contact', 'contact', $id);
         setFlash('success', 'Message deleted.');
     }
-    redirect('../messages.php');
+    redirect('../messages');
 }
 
 // ===== ADMIN: Export =====

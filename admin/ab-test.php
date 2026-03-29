@@ -9,12 +9,12 @@ $db = getDB();
 try { $db->exec(file_get_contents(__DIR__ . '/includes/schema_subscribers.sql')); } catch (Exception $e) {}
 
 $campaignId = (int)($_GET['campaign_id'] ?? 0);
-if (!$campaignId) { redirect('newsletter.php?tab=campaigns'); }
+if (!$campaignId) { redirect('newsletter?tab=campaigns'); }
 
 $campaign = $db->prepare('SELECT * FROM campaigns WHERE id = ?');
 $campaign->execute([$campaignId]);
 $campaign = $campaign->fetch();
-if (!$campaign) { setFlash('error', 'Campaign not found.'); redirect('newsletter.php?tab=campaigns'); }
+if (!$campaign) { setFlash('error', 'Campaign not found.'); redirect('newsletter?tab=campaigns'); }
 
 // Handle create A/B test
 if (isPost() && ($_GET['action'] ?? '') === 'create_test') {
@@ -31,7 +31,7 @@ if (isPost() && ($_GET['action'] ?? '') === 'create_test') {
             setFlash('success', 'A/B test created. Click "Start Test" to begin.');
         }
     }
-    redirect('ab-test.php?campaign_id=' . $campaignId);
+    redirect('ab-test?campaign_id=' . $campaignId);
 }
 
 // Start test
@@ -62,14 +62,14 @@ if (($_GET['action'] ?? '') === 'start_test') {
         $groupB = array_slice($testSubs, $halfPoint);
 
         $mailer = new Mailer();
-        $trackBase = rtrim(APP_URL, '/') . '/admin/api/track.php';
+        $trackBase = rtrim(APP_URL, '/') . '/admin/api/track';
         $logStmt = $db->prepare('INSERT INTO ab_test_logs (ab_test_id, subscriber_id, variant) VALUES (?, ?, ?)');
         $sentA = 0; $sentB = 0;
 
         // Send variant A
         foreach ($groupA as $sub) {
             $html = getEmailWrapper($emailContent, '');
-            $unsubUrl = rtrim(APP_URL, '/') . '/admin/api/newsletter.php?action=unsubscribe&token=' . $sub['unsubscribe_token'];
+            $unsubUrl = rtrim(APP_URL, '/') . '/admin/api/newsletter?action=unsubscribe&token=' . $sub['unsubscribe_token'];
             $html = str_replace('{{unsubscribe_url}}', $unsubUrl, $html);
             // Open tracking for A/B
             $html .= '<img src="' . $trackBase . '?action=open&cid=' . $campaignId . '&sid=' . $sub['id'] . '" width="1" height="1" style="display:none;" alt="">';
@@ -82,7 +82,7 @@ if (($_GET['action'] ?? '') === 'start_test') {
         // Send variant B
         foreach ($groupB as $sub) {
             $html = getEmailWrapper($emailContent, '');
-            $unsubUrl = rtrim(APP_URL, '/') . '/admin/api/newsletter.php?action=unsubscribe&token=' . $sub['unsubscribe_token'];
+            $unsubUrl = rtrim(APP_URL, '/') . '/admin/api/newsletter?action=unsubscribe&token=' . $sub['unsubscribe_token'];
             $html = str_replace('{{unsubscribe_url}}', $unsubUrl, $html);
             $html .= '<img src="' . $trackBase . '?action=open&cid=' . $campaignId . '&sid=' . $sub['id'] . '" width="1" height="1" style="display:none;" alt="">';
             if ($mailer->send($sub['email'], $test['variant_b_subject'], $html)) {
@@ -97,7 +97,7 @@ if (($_GET['action'] ?? '') === 'start_test') {
         logActivity($_SESSION['admin_id'], 'start_ab_test', 'campaign', $campaignId, ['a_sent' => $sentA, 'b_sent' => $sentB]);
         setFlash('success', "Test started! Sent {$sentA} variant A and {$sentB} variant B. Winner determined in {$test['test_duration_hours']}h.");
     }
-    redirect('ab-test.php?campaign_id=' . $campaignId);
+    redirect('ab-test?campaign_id=' . $campaignId);
 }
 
 // Pick winner manually
@@ -118,7 +118,7 @@ if (($_GET['action'] ?? '') === 'pick_winner') {
             setFlash('success', "Winner: Variant " . strtoupper($winner) . ". Campaign subject updated. You can now send the campaign.");
         }
     }
-    redirect('ab-test.php?campaign_id=' . $campaignId);
+    redirect('ab-test?campaign_id=' . $campaignId);
 }
 
 // Load existing tests
@@ -159,7 +159,7 @@ renderHeader('A/B Test — ' . sanitize($campaign['subject']), 'newsletter');
 ?>
 
 <div class="msg-back">
-    <a href="campaign-edit.php?id=<?= $campaignId ?>" class="btn btn-ghost btn-sm">
+    <a href="campaign-edit?id=<?= $campaignId ?>" class="btn btn-ghost btn-sm">
         <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/></svg>
         Back to Campaign
     </a>
@@ -170,7 +170,7 @@ renderHeader('A/B Test — ' . sanitize($campaign['subject']), 'newsletter');
 <div class="card" style="margin-bottom:20px;">
     <div class="card-header"><h2>Create A/B Test</h2></div>
     <div class="card-body">
-        <form method="POST" action="ab-test.php?action=create_test&campaign_id=<?= $campaignId ?>">
+        <form method="POST" action="ab-test?action=create_test&campaign_id=<?= $campaignId ?>">
             <?= csrfField() ?>
             <div class="form-group">
                 <label>Variant A (current subject)</label>
@@ -263,17 +263,17 @@ renderHeader('A/B Test — ' . sanitize($campaign['subject']), 'newsletter');
         <!-- Actions -->
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <?php if (!$t['started_at'] && $t['status'] === 'testing'): ?>
-            <a href="ab-test.php?action=start_test&test_id=<?= $t['id'] ?>&campaign_id=<?= $campaignId ?>" class="btn btn-primary" onclick="return confirm('Start sending test emails?')">Start Test</a>
+            <a href="ab-test?action=start_test&test_id=<?= $t['id'] ?>&campaign_id=<?= $campaignId ?>" class="btn btn-primary" onclick="return confirm('Start sending test emails?')">Start Test</a>
             <?php endif; ?>
             <?php if ($t['started_at'] && $t['status'] === 'testing'): ?>
-            <a href="ab-test.php?action=pick_winner&test_id=<?= $t['id'] ?>&campaign_id=<?= $campaignId ?>&winner=a" class="btn btn-secondary btn-sm">Pick A as Winner</a>
-            <a href="ab-test.php?action=pick_winner&test_id=<?= $t['id'] ?>&campaign_id=<?= $campaignId ?>&winner=b" class="btn btn-secondary btn-sm">Pick B as Winner</a>
+            <a href="ab-test?action=pick_winner&test_id=<?= $t['id'] ?>&campaign_id=<?= $campaignId ?>&winner=a" class="btn btn-secondary btn-sm">Pick A as Winner</a>
+            <a href="ab-test?action=pick_winner&test_id=<?= $t['id'] ?>&campaign_id=<?= $campaignId ?>&winner=b" class="btn btn-secondary btn-sm">Pick B as Winner</a>
             <span style="font-size:0.8rem;color:var(--text-muted);align-self:center;">
                 Auto-picks in <?= max(0, round((strtotime($t['started_at']) + ($t['test_duration_hours'] * 3600) - time()) / 3600, 1)) ?>h
             </span>
             <?php endif; ?>
             <?php if ($t['status'] === 'completed'): ?>
-            <span style="font-size:0.85rem;color:var(--green);align-self:center;">Campaign subject updated to winning variant. <a href="newsletter.php?tab=campaigns" style="color:var(--blue);">Send the campaign now.</a></span>
+            <span style="font-size:0.85rem;color:var(--green);align-self:center;">Campaign subject updated to winning variant. <a href="newsletter?tab=campaigns" style="color:var(--blue);">Send the campaign now.</a></span>
             <?php endif; ?>
         </div>
     </div>

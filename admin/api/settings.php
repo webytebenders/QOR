@@ -267,24 +267,24 @@ if ($action === 'optimize_db' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 // ===== RESTORE FROM BACKUP =====
 if ($action === 'restore' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = $_POST[CSRF_TOKEN_NAME] ?? '';
-    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../settings.php?tab=backup'); }
+    if (!validateCSRF($token)) { setFlash('error', 'Invalid request.'); redirect('../settings?tab=backup'); }
 
     if (!isset($_FILES['backup_file']) || $_FILES['backup_file']['error'] !== UPLOAD_ERR_OK) {
         setFlash('error', 'No file uploaded or upload error.');
-        redirect('../settings.php?tab=backup');
+        redirect('../settings?tab=backup');
     }
 
     $file = $_FILES['backup_file'];
     $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
     if ($ext !== 'sql') {
         setFlash('error', 'Only .sql files are allowed.');
-        redirect('../settings.php?tab=backup');
+        redirect('../settings?tab=backup');
     }
 
     $sql = file_get_contents($file['tmp_name']);
     if (!$sql) {
         setFlash('error', 'File is empty.');
-        redirect('../settings.php?tab=backup');
+        redirect('../settings?tab=backup');
     }
 
     try {
@@ -305,7 +305,7 @@ if ($action === 'restore' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         setFlash('error', 'Restore failed: ' . $e->getMessage());
     }
 
-    redirect('../settings.php?tab=backup');
+    redirect('../settings?tab=backup');
 }
 
 // ===== BACKUP: Full Database =====
@@ -379,6 +379,78 @@ if ($action === 'backup_table') {
     header('Content-Disposition: attachment; filename="' . $table . '_' . date('Y-m-d') . '.sql"');
     echo $sql;
     exit;
+}
+
+// ===== UPLOAD LOGO =====
+if ($action === 'upload_logo' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!validateCSRF($_POST['csrf_token'] ?? '')) {
+        jsonResponse(['success' => false, 'error' => 'Invalid CSRF token.'], 403);
+    }
+
+    if (!isset($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
+        jsonResponse(['success' => false, 'error' => 'No file uploaded.'], 400);
+    }
+
+    $file = $_FILES['file'];
+    if ($file['size'] > 2 * 1024 * 1024) {
+        jsonResponse(['success' => false, 'error' => 'File too large. Max 2 MB.'], 400);
+    }
+
+    $finfo = new finfo(FILEINFO_MIME_TYPE);
+    $mime = $finfo->file($file['tmp_name']);
+    $allowedLogo = ['image/png', 'image/svg+xml', 'image/webp', 'image/jpeg'];
+
+    if (!in_array($mime, $allowedLogo)) {
+        jsonResponse(['success' => false, 'error' => 'Invalid file type. Allowed: PNG, SVG, WebP, JPEG.'], 400);
+    }
+
+    $dest = realpath(__DIR__ . '/../../assets/images') . '/qor-logo.png';
+    if (!$dest) {
+        jsonResponse(['success' => false, 'error' => 'Upload directory not found.'], 500);
+    }
+
+    if (!move_uploaded_file($file['tmp_name'], $dest)) {
+        jsonResponse(['success' => false, 'error' => 'Failed to save file.'], 500);
+    }
+
+    logActivity($admin['id'], 'upload_logo', 'settings', null, ['original' => $file['name'], 'size' => $file['size']]);
+    jsonResponse(['success' => true]);
+}
+
+// ===== UPLOAD FAVICON =====
+if ($action === 'upload_favicon' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!validateCSRF($_POST['csrf_token'] ?? '')) {
+        jsonResponse(['success' => false, 'error' => 'Invalid CSRF token.'], 403);
+    }
+
+    if (!isset($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
+        jsonResponse(['success' => false, 'error' => 'No file uploaded.'], 400);
+    }
+
+    $file = $_FILES['file'];
+    if ($file['size'] > 1 * 1024 * 1024) {
+        jsonResponse(['success' => false, 'error' => 'File too large. Max 1 MB.'], 400);
+    }
+
+    $finfo = new finfo(FILEINFO_MIME_TYPE);
+    $mime = $finfo->file($file['tmp_name']);
+    $allowedFavicon = ['image/png', 'image/x-icon', 'image/vnd.microsoft.icon', 'image/svg+xml', 'image/webp'];
+
+    if (!in_array($mime, $allowedFavicon)) {
+        jsonResponse(['success' => false, 'error' => 'Invalid file type. Allowed: PNG, ICO, SVG, WebP.'], 400);
+    }
+
+    $dest = realpath(__DIR__ . '/../../assets/images') . '/favicon.png';
+    if (!$dest) {
+        jsonResponse(['success' => false, 'error' => 'Upload directory not found.'], 500);
+    }
+
+    if (!move_uploaded_file($file['tmp_name'], $dest)) {
+        jsonResponse(['success' => false, 'error' => 'Failed to save file.'], 500);
+    }
+
+    logActivity($admin['id'], 'upload_favicon', 'settings', null, ['original' => $file['name'], 'size' => $file['size']]);
+    jsonResponse(['success' => true]);
 }
 
 jsonResponse(['error' => 'Invalid action.'], 400);

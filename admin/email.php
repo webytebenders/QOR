@@ -68,7 +68,7 @@ renderHeader('Email System', 'email');
         <div class="card-header"><h2>Test SMTP</h2></div>
         <div class="card-body">
             <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:16px;">Send a test email to verify your SMTP configuration is working.</p>
-            <form method="POST" action="api/email.php?action=test_smtp">
+            <form method="POST" action="api/email?action=test_smtp">
                 <?= csrfField() ?>
                 <div class="form-group">
                     <label>Send Test To</label>
@@ -162,7 +162,7 @@ renderHeader('Email System', 'email');
             <h3 id="tplModalTitle">Edit Template</h3>
             <button class="modal-close" onclick="closeTplModal()">&times;</button>
         </div>
-        <form method="POST" action="api/email.php?action=save_template">
+        <form method="POST" action="api/email?action=save_template">
             <?= csrfField() ?>
             <input type="hidden" name="tpl_id" id="tplId" value="0">
             <div class="modal-body" style="gap:14px">
@@ -239,14 +239,14 @@ function openTemplateEditor(id) {
         // Toggle + Delete buttons
         const csrf = document.querySelector('input[name="<?= CSRF_TOKEN_NAME ?>"]').value;
         document.getElementById('tplActions').innerHTML = `
-            <form method="POST" action="api/email.php?action=toggle_template" style="display:inline">
+            <form method="POST" action="api/email?action=toggle_template" style="display:inline">
                 <input type="hidden" name="<?= CSRF_TOKEN_NAME ?>" value="${csrf}">
                 <input type="hidden" name="tpl_id" value="${tpl.id}">
                 <button type="submit" class="btn btn-sm ${tpl.is_active == 1 ? 'btn-secondary' : 'btn-primary'}" title="${tpl.is_active == 1 ? 'Disable' : 'Enable'}">
                     ${tpl.is_active == 1 ? 'Disable' : 'Enable'}
                 </button>
             </form>
-            <form method="POST" action="api/email.php?action=delete_template" style="display:inline" onsubmit="return confirm('Delete this template?')">
+            <form method="POST" action="api/email?action=delete_template" style="display:inline" onsubmit="return confirm('Delete this template?')">
                 <input type="hidden" name="<?= CSRF_TOKEN_NAME ?>" value="${csrf}">
                 <input type="hidden" name="tpl_id" value="${tpl.id}">
                 <button type="submit" class="btn btn-danger btn-sm">Delete</button>
@@ -262,7 +262,7 @@ function closeTplModal() {
 function previewTemplate() {
     const id = document.getElementById('tplId').value;
     if (id && id !== '0') {
-        window.open('api/email.php?action=preview_template&id=' + id, '_blank', 'width=700,height=600');
+        window.open('api/email?action=preview_template&id=' + id, '_blank', 'width=700,height=600');
     }
 }
 </script>

@@ -198,7 +198,7 @@ const waitlistForm = document.getElementById('waitlistForm');
 // Detect the current page for source tracking
 function getSourcePage() {
   const path = window.location.pathname;
-  const page = path.split('/').pop().replace('.html', '') || 'home';
+  const page = path.split('/').pop() || 'home';
   const formId = event && event.target ? event.target.id : '';
   if (formId === 'heroForm') return 'home_hero';
   if (formId === 'waitlistForm') return page + '_cta';
@@ -217,7 +217,7 @@ function handleFormSubmit(e) {
   button.textContent = 'Sending...';
   button.disabled = true;
 
-  fetch('admin/api/waitlist.php?action=subscribe', {
+  fetch('admin/api/waitlist?action=subscribe', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -309,7 +309,7 @@ if (newsletterForm) {
     button.textContent = 'Subscribing...';
     button.disabled = true;
 
-    fetch('admin/api/newsletter.php?action=subscribe', {
+    fetch('admin/api/newsletter?action=subscribe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: email, source: 'blog_newsletter' })
@@ -368,7 +368,7 @@ if (contactForm) {
     btn.textContent = 'Sending...';
     btn.disabled = true;
 
-    fetch('admin/api/contacts.php?action=submit', {
+    fetch('admin/api/contacts?action=submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)

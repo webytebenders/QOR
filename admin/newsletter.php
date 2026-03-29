@@ -26,7 +26,7 @@ if (isPost() && ($_GET['action'] ?? '') === 'create_tag') {
             }
         }
     }
-    redirect('newsletter.php?tab=tags');
+    redirect('newsletter?tab=tags');
 }
 
 if (isPost() && ($_GET['action'] ?? '') === 'update_tag') {
@@ -41,14 +41,14 @@ if (isPost() && ($_GET['action'] ?? '') === 'update_tag') {
             setFlash('success', "Tag updated.");
         }
     }
-    redirect('newsletter.php?tab=tags');
+    redirect('newsletter?tab=tags');
 }
 
 if (($_GET['action'] ?? '') === 'delete_tag' && ($id = (int)($_GET['id'] ?? 0))) {
     $db->prepare('DELETE FROM tags WHERE id = ?')->execute([$id]);
     logActivity($_SESSION['admin_id'], 'delete_tag', 'newsletter', $id);
     setFlash('success', 'Tag deleted.');
-    redirect('newsletter.php?tab=tags');
+    redirect('newsletter?tab=tags');
 }
 
 // ===== SEGMENT ACTIONS =====
@@ -62,7 +62,7 @@ if (isPost() && ($_GET['action'] ?? '') === 'save_segment') {
 
         // Validate rules JSON
         $decoded = json_decode($rules, true);
-        if (!$decoded) { setFlash('error', 'Invalid rules JSON.'); redirect('newsletter.php?tab=segments'); }
+        if (!$decoded) { setFlash('error', 'Invalid rules JSON.'); redirect('newsletter?tab=segments'); }
 
         if ($name) {
             if ($id) {
@@ -74,14 +74,14 @@ if (isPost() && ($_GET['action'] ?? '') === 'save_segment') {
             setFlash('success', 'Segment saved.');
         }
     }
-    redirect('newsletter.php?tab=segments');
+    redirect('newsletter?tab=segments');
 }
 
 if (($_GET['action'] ?? '') === 'delete_segment' && ($id = (int)($_GET['id'] ?? 0))) {
     $db->prepare('DELETE FROM segments WHERE id = ?')->execute([$id]);
     logActivity($_SESSION['admin_id'], 'delete_segment', 'newsletter', $id);
     setFlash('success', 'Segment deleted.');
-    redirect('newsletter.php?tab=segments');
+    redirect('newsletter?tab=segments');
 }
 
 // ===== INLINE TAG ASSIGN/REMOVE =====
@@ -101,7 +101,7 @@ if (isPost() && ($_GET['action'] ?? '') === 'assign_tag') {
             } catch (Exception $e) {} // already tagged
         }
     }
-    redirect('newsletter.php?tab=subscribers&page=' . ($_GET['page'] ?? 1));
+    redirect('newsletter?tab=subscribers&page=' . ($_GET['page'] ?? 1));
 }
 
 if (isPost() && ($_GET['action'] ?? '') === 'remove_sub_tag') {
@@ -113,7 +113,7 @@ if (isPost() && ($_GET['action'] ?? '') === 'remove_sub_tag') {
             $db->prepare('DELETE FROM subscriber_tags WHERE subscriber_id = ? AND tag_id = ?')->execute([$subId, $tagId]);
         }
     }
-    redirect('newsletter.php?tab=subscribers&page=' . ($_GET['page'] ?? 1));
+    redirect('newsletter?tab=subscribers&page=' . ($_GET['page'] ?? 1));
 }
 
 // ===== SUBSCRIBERS TAB DATA =====
@@ -232,12 +232,12 @@ renderHeader('Newsletter', 'newsletter');
 
 <!-- Tabs -->
 <div class="tabs">
-    <a href="newsletter.php?tab=subscribers" class="tab <?= $tab === 'subscribers' ? 'tab-active' : '' ?>">Subscribers</a>
-    <a href="newsletter.php?tab=import" class="tab <?= $tab === 'import' ? 'tab-active' : '' ?>">Import</a>
-    <a href="newsletter.php?tab=tags" class="tab <?= $tab === 'tags' ? 'tab-active' : '' ?>">Tags</a>
-    <a href="newsletter.php?tab=segments" class="tab <?= $tab === 'segments' ? 'tab-active' : '' ?>">Segments</a>
-    <a href="newsletter.php?tab=campaigns" class="tab <?= $tab === 'campaigns' ? 'tab-active' : '' ?>">Campaigns</a>
-    <a href="newsletter.php?tab=health" class="tab <?= $tab === 'health' ? 'tab-active' : '' ?>">List Health</a>
+    <a href="newsletter?tab=subscribers" class="tab <?= $tab === 'subscribers' ? 'tab-active' : '' ?>">Subscribers</a>
+    <a href="newsletter?tab=import" class="tab <?= $tab === 'import' ? 'tab-active' : '' ?>">Import</a>
+    <a href="newsletter?tab=tags" class="tab <?= $tab === 'tags' ? 'tab-active' : '' ?>">Tags</a>
+    <a href="newsletter?tab=segments" class="tab <?= $tab === 'segments' ? 'tab-active' : '' ?>">Segments</a>
+    <a href="newsletter?tab=campaigns" class="tab <?= $tab === 'campaigns' ? 'tab-active' : '' ?>">Campaigns</a>
+    <a href="newsletter?tab=health" class="tab <?= $tab === 'health' ? 'tab-active' : '' ?>">List Health</a>
 </div>
 
 <?php if ($tab === 'subscribers'): ?>
@@ -258,14 +258,14 @@ renderHeader('Newsletter', 'newsletter');
             <?php endforeach; ?>
         </select>
         <button type="submit" class="btn btn-secondary btn-sm">Filter</button>
-        <?php if ($search || $filterStatus || $filterTag): ?><a href="newsletter.php?tab=subscribers" class="btn btn-ghost btn-sm">Clear</a><?php endif; ?>
+        <?php if ($search || $filterStatus || $filterTag): ?><a href="newsletter?tab=subscribers" class="btn btn-ghost btn-sm">Clear</a><?php endif; ?>
     </form>
     <div class="filters-actions">
-        <form method="POST" action="api/newsletter.php?action=import_waitlist" style="display:inline" onsubmit="return confirm('Import all waitlist members who are not yet newsletter subscribers?')">
+        <form method="POST" action="api/newsletter?action=import_waitlist" style="display:inline" onsubmit="return confirm('Import all waitlist members who are not yet newsletter subscribers?')">
             <?= csrfField() ?>
             <button type="submit" class="btn btn-secondary btn-sm">Import Waitlist</button>
         </form>
-        <a href="api/newsletter.php?action=export&status=<?= urlencode($filterStatus) ?>" class="btn btn-secondary btn-sm">Export CSV</a>
+        <a href="api/newsletter?action=export&status=<?= urlencode($filterStatus) ?>" class="btn btn-secondary btn-sm">Export CSV</a>
         <span class="filters-count"><?= number_format($total) ?> subscribers</span>
     </div>
 </div>
@@ -314,7 +314,7 @@ renderHeader('Newsletter', 'newsletter');
                                 <?php foreach ($subTags[$sub['id']] ?? [] as $st): ?>
                                 <span style="display:inline-flex;align-items:center;gap:3px;background:<?= $st['color'] ?>20;color:<?= $st['color'] ?>;padding:2px 8px;border-radius:10px;font-size:0.7rem;font-weight:600;">
                                     <?= sanitize($st['name']) ?>
-                                    <form method="POST" action="newsletter.php?action=remove_sub_tag&page=<?= $page ?>" style="display:inline;">
+                                    <form method="POST" action="newsletter?action=remove_sub_tag&page=<?= $page ?>" style="display:inline;">
                                         <?= csrfField() ?>
                                         <input type="hidden" name="subscriber_id" value="<?= $sub['id'] ?>">
                                         <input type="hidden" name="tag_id" value="<?= $st['tag_id'] ?>">
@@ -330,7 +330,7 @@ renderHeader('Newsletter', 'newsletter');
                                             foreach ($subTags[$sub['id']] ?? [] as $st) { if ($st['tag_id'] == $t['id']) { $alreadyHas = true; break; } }
                                             if ($alreadyHas) continue;
                                         ?>
-                                        <form method="POST" action="newsletter.php?action=assign_tag&page=<?= $page ?>">
+                                        <form method="POST" action="newsletter?action=assign_tag&page=<?= $page ?>">
                                             <?= csrfField() ?>
                                             <input type="hidden" name="subscriber_id" value="<?= $sub['id'] ?>">
                                             <input type="hidden" name="tag_id" value="<?= $t['id'] ?>">
@@ -350,7 +350,7 @@ renderHeader('Newsletter', 'newsletter');
                         <td><span class="source-badge"><?= sanitize($sub['source']) ?></span></td>
                         <td title="<?= $sub['subscribed_at'] ?>"><?= timeAgo($sub['subscribed_at']) ?></td>
                         <td>
-                            <form method="POST" action="api/newsletter.php?action=delete_sub" style="display:inline" onsubmit="return confirm('Remove this subscriber?')">
+                            <form method="POST" action="api/newsletter?action=delete_sub" style="display:inline" onsubmit="return confirm('Remove this subscriber?')">
                                 <?= csrfField() ?>
                                 <input type="hidden" name="id" value="<?= $sub['id'] ?>">
                                 <button type="submit" class="btn btn-danger btn-sm">Del</button>
@@ -391,7 +391,7 @@ function bulkTag(mode) {
     result.textContent = 'Processing...';
     result.style.color = 'var(--text-muted)';
 
-    fetch('api/newsletter.php?action=bulk_tag', {
+    fetch('api/newsletter?action=bulk_tag', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ mode: mode, tag_id: parseInt(tagId), subscriber_ids: checked.map(Number), csrf_token: '<?= generateCSRFToken() ?>' })
@@ -485,7 +485,7 @@ function bulkTag(mode) {
     <div class="card-header"><h2>Other Import Sources</h2></div>
     <div class="card-body">
         <div style="display:flex;gap:12px;flex-wrap:wrap;">
-            <form method="POST" action="api/newsletter.php?action=import_waitlist" style="display:inline" onsubmit="return confirm('Import all waitlist members not yet subscribed?')">
+            <form method="POST" action="api/newsletter?action=import_waitlist" style="display:inline" onsubmit="return confirm('Import all waitlist members not yet subscribed?')">
                 <?= csrfField() ?>
                 <button type="submit" class="btn btn-secondary">Import from Waitlist</button>
             </form>
@@ -585,7 +585,7 @@ function runImport() {
     result.textContent = 'Importing ' + rows.length + ' rows...';
     result.style.color = 'var(--text-muted)';
 
-    fetch('api/newsletter.php?action=import_csv', {
+    fetch('api/newsletter?action=import_csv', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
@@ -609,7 +609,7 @@ function runImport() {
 <div class="card" style="margin-bottom:20px;">
     <div class="card-header"><h2>Create Tag</h2></div>
     <div class="card-body">
-        <form method="POST" action="newsletter.php?action=create_tag" style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
+        <form method="POST" action="newsletter?action=create_tag" style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
             <?= csrfField() ?>
             <div class="form-group" style="flex:1;min-width:180px;margin:0;">
                 <label>Tag Name</label>
@@ -649,9 +649,9 @@ function runImport() {
                                 <button class="btn btn-secondary btn-sm" onclick="this.nextElementSibling.classList.toggle('show')">Actions &#9662;</button>
                                 <div class="dropdown-menu">
                                     <button class="dropdown-item" onclick="this.closest('.dropdown-menu').classList.remove('show');editTag(<?= $t['id'] ?>, '<?= sanitize($t['name']) ?>', '<?= $t['color'] ?>')">Edit Tag</button>
-                                    <a href="newsletter.php?tab=subscribers&tag=<?= $t['id'] ?>" class="dropdown-item">View Subscribers</a>
+                                    <a href="newsletter?tab=subscribers&tag=<?= $t['id'] ?>" class="dropdown-item">View Subscribers</a>
                                     <div class="dropdown-divider"></div>
-                                    <a href="newsletter.php?action=delete_tag&id=<?= $t['id'] ?>" class="dropdown-item dropdown-item-danger" onclick="return confirm('Delete this tag?')">Delete</a>
+                                    <a href="newsletter?action=delete_tag&id=<?= $t['id'] ?>" class="dropdown-item dropdown-item-danger" onclick="return confirm('Delete this tag?')">Delete</a>
                                 </div>
                             </div>
                         </td>
@@ -669,7 +669,7 @@ function runImport() {
     <div class="modal-overlay" onclick="this.parentElement.classList.remove('show')"></div>
     <div class="modal-content">
         <div class="modal-header"><h3>Edit Tag</h3><button class="modal-close" onclick="this.closest('.modal').classList.remove('show')">&times;</button></div>
-        <form method="POST" action="newsletter.php?action=update_tag">
+        <form method="POST" action="newsletter?action=update_tag">
             <?= csrfField() ?>
             <input type="hidden" name="id" id="editTagId">
             <div class="modal-body">
@@ -704,7 +704,7 @@ function editTag(id, name, color) {
 <div class="card" style="margin-bottom:20px;">
     <div class="card-header"><h2><?= $editSegment ? 'Edit' : 'Create' ?> Segment</h2></div>
     <div class="card-body">
-        <form method="POST" action="newsletter.php?action=save_segment" id="segmentForm">
+        <form method="POST" action="newsletter?action=save_segment" id="segmentForm">
             <?= csrfField() ?>
             <?php if ($editSegment): ?><input type="hidden" name="id" value="<?= $editSegment['id'] ?>"><?php endif; ?>
 
@@ -737,7 +737,7 @@ function editTag(id, name, color) {
 
             <div style="display:flex;gap:8px;align-items:center;">
                 <button type="submit" class="btn btn-primary"><?= $editSegment ? 'Update' : 'Create' ?> Segment</button>
-                <?php if ($editSegment): ?><a href="newsletter.php?tab=segments" class="btn btn-ghost">Cancel</a><?php endif; ?>
+                <?php if ($editSegment): ?><a href="newsletter?tab=segments" class="btn btn-ghost">Cancel</a><?php endif; ?>
                 <button type="button" class="btn btn-secondary btn-sm" onclick="previewSegment()">Preview Count</button>
                 <span id="previewCount" style="font-size:0.85rem;font-weight:600;"></span>
             </div>
@@ -766,8 +766,8 @@ function editTag(id, name, color) {
                         </td>
                         <td><strong><?= number_format($seg['subscriber_count']) ?></strong></td>
                         <td style="white-space:nowrap;">
-                            <a href="newsletter.php?tab=segments&edit_segment=<?= $seg['id'] ?>" class="btn btn-secondary btn-sm">Edit</a>
-                            <a href="newsletter.php?action=delete_segment&id=<?= $seg['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Delete this segment?')">Del</a>
+                            <a href="newsletter?tab=segments&edit_segment=<?= $seg['id'] ?>" class="btn btn-secondary btn-sm">Edit</a>
+                            <a href="newsletter?action=delete_segment&id=<?= $seg['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Delete this segment?')">Del</a>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -862,7 +862,7 @@ function previewSegment() {
     const result = document.getElementById('previewCount');
     result.textContent = 'Counting...';
     result.style.color = 'var(--text-muted)';
-    fetch('api/newsletter.php?action=preview_segment', {
+    fetch('api/newsletter?action=preview_segment', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ rules: JSON.parse(rules), csrf_token: '<?= generateCSRFToken() ?>' })
@@ -886,8 +886,8 @@ addCondition('status', 'equals', 'active');
 <?php elseif ($tab === 'campaigns'): ?>
 <!-- ==================== CAMPAIGNS ==================== -->
 <div class="page-actions" style="gap:8px;">
-    <a href="campaign-templates.php" class="btn btn-secondary">Templates</a>
-    <a href="campaign-edit.php" class="btn btn-primary">
+    <a href="campaign-templates" class="btn btn-secondary">Templates</a>
+    <a href="campaign-edit" class="btn btn-primary">
         <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
         New Campaign
     </a>
@@ -915,7 +915,7 @@ addCondition('status', 'equals', 'active');
                     <?php else: ?>
                     <?php foreach ($campaigns as $c): ?>
                     <tr>
-                        <td><a href="campaign-edit.php?id=<?= $c['id'] ?>" class="post-link"><?= sanitize($c['subject']) ?></a></td>
+                        <td><a href="campaign-edit?id=<?= $c['id'] ?>" class="post-link"><?= sanitize($c['subject']) ?></a></td>
                         <td>
                             <?php if (($c['audience_type'] ?? 'all') === 'all'): ?>
                             <span class="badge-blue">All</span>
@@ -941,20 +941,20 @@ addCondition('status', 'equals', 'active');
                             <div class="action-dropdown">
                                 <button class="btn btn-secondary btn-sm" onclick="this.nextElementSibling.classList.toggle('show')">Actions &#9662;</button>
                                 <div class="dropdown-menu">
-                                    <a href="campaign-edit.php?id=<?= $c['id'] ?>" class="dropdown-item">Edit Campaign</a>
+                                    <a href="campaign-edit?id=<?= $c['id'] ?>" class="dropdown-item">Edit Campaign</a>
                                     <?php if ($c['status'] === 'sent'): ?>
-                                    <a href="campaign-stats.php?id=<?= $c['id'] ?>" class="dropdown-item">View Stats</a>
+                                    <a href="campaign-stats?id=<?= $c['id'] ?>" class="dropdown-item">View Stats</a>
                                     <?php endif; ?>
                                     <?php if ($c['status'] !== 'sent' && $c['status'] !== 'sending'): ?>
-                                    <a href="ab-test.php?campaign_id=<?= $c['id'] ?>" class="dropdown-item">A/B Test</a>
+                                    <a href="ab-test?campaign_id=<?= $c['id'] ?>" class="dropdown-item">A/B Test</a>
                                     <?php endif; ?>
-                                    <a href="campaign-templates.php?action=from_campaign&id=<?= $c['id'] ?>" class="dropdown-item">Save as Template</a>
+                                    <a href="campaign-templates?action=from_campaign&id=<?= $c['id'] ?>" class="dropdown-item">Save as Template</a>
                                     <?php if ($c['status'] !== 'sent' && $c['status'] !== 'sending'): ?>
                                     <div class="dropdown-divider"></div>
-                                    <form method="POST" action="api/email.php?action=send_campaign" onsubmit="return confirm('Send this campaign?')"><input type="hidden" name="<?= CSRF_TOKEN_NAME ?>" value="<?= generateCSRFToken() ?>"><input type="hidden" name="campaign_id" value="<?= $c['id'] ?>"><button type="submit" class="dropdown-item" style="color:var(--green);">Send Now</button></form>
+                                    <form method="POST" action="api/email?action=send_campaign" onsubmit="return confirm('Send this campaign?')"><input type="hidden" name="<?= CSRF_TOKEN_NAME ?>" value="<?= generateCSRFToken() ?>"><input type="hidden" name="campaign_id" value="<?= $c['id'] ?>"><button type="submit" class="dropdown-item" style="color:var(--green);">Send Now</button></form>
                                     <?php endif; ?>
                                     <div class="dropdown-divider"></div>
-                                    <form method="POST" action="api/newsletter.php?action=delete_campaign" onsubmit="return confirm('Delete this campaign?')"><input type="hidden" name="<?= CSRF_TOKEN_NAME ?>" value="<?= generateCSRFToken() ?>"><input type="hidden" name="id" value="<?= $c['id'] ?>"><button type="submit" class="dropdown-item dropdown-item-danger">Delete</button></form>
+                                    <form method="POST" action="api/newsletter?action=delete_campaign" onsubmit="return confirm('Delete this campaign?')"><input type="hidden" name="<?= CSRF_TOKEN_NAME ?>" value="<?= generateCSRFToken() ?>"><input type="hidden" name="id" value="<?= $c['id'] ?>"><button type="submit" class="dropdown-item dropdown-item-danger">Delete</button></form>
                                 </div>
                             </div>
                         </td>
@@ -1092,7 +1092,7 @@ $healthColor = $healthScore >= 70 ? 'var(--green)' : ($healthScore >= 40 ? 'var(
             <?php endif; ?>
             <div style="display:flex;align-items:start;gap:8px;">
                 <span style="color:var(--blue);font-size:1.2rem;">&#9432;</span>
-                <div>Preference center link is included in all emails. Subscribers can manage their frequency and topics at: <code style="font-size:0.8rem;"><?= APP_URL ?>/admin/api/preferences.php?token=...</code></div>
+                <div>Preference center link is included in all emails. Subscribers can manage their frequency and topics at: <code style="font-size:0.8rem;"><?= APP_URL ?>/admin/api/preferences?token=...</code></div>
             </div>
         </div>
     </div>
@@ -1109,7 +1109,7 @@ if (!empty($sendingCampaigns) && $tab === 'campaigns'):
 (function pollProgress() {
     const ids = [<?= implode(',', array_column($sendingCampaigns, 'id')) ?>];
     ids.forEach(id => {
-        fetch('api/email.php?action=send_progress&campaign_id=' + id)
+        fetch('api/email?action=send_progress&campaign_id=' + id)
         .then(r => r.json())
         .then(d => {
             if (!d.success) return;

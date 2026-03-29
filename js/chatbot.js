@@ -4,7 +4,7 @@
  */
 
 (function() {
-    const API_URL = 'admin/api/chat.php';
+    const API_URL = 'admin/api/chat';
     let sessionToken = null;
     let isOpen = false;
     let botName = 'Core Chain Bot';

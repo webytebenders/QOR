@@ -48,13 +48,14 @@ renderHeader('Settings', 'settings');
 ?>
 
 <div class="tabs">
-    <a href="settings.php?tab=general" class="tab <?= $tab === 'general' ? 'tab-active' : '' ?>">General</a>
-    <a href="settings.php?tab=email" class="tab <?= $tab === 'email' ? 'tab-active' : '' ?>">Email / SMTP</a>
-    <a href="settings.php?tab=security" class="tab <?= $tab === 'security' ? 'tab-active' : '' ?>">Security</a>
-    <a href="settings.php?tab=logins" class="tab <?= $tab === 'logins' ? 'tab-active' : '' ?>">Login History</a>
-    <a href="settings.php?tab=media" class="tab <?= $tab === 'media' ? 'tab-active' : '' ?>">Media</a>
-    <a href="settings.php?tab=backup" class="tab <?= $tab === 'backup' ? 'tab-active' : '' ?>">Backup</a>
-    <a href="settings.php?tab=maintenance" class="tab <?= $tab === 'maintenance' ? 'tab-active' : '' ?>">Maintenance</a>
+    <a href="settings?tab=general" class="tab <?= $tab === 'general' ? 'tab-active' : '' ?>">General</a>
+    <a href="settings?tab=branding" class="tab <?= $tab === 'branding' ? 'tab-active' : '' ?>">Branding</a>
+    <a href="settings?tab=email" class="tab <?= $tab === 'email' ? 'tab-active' : '' ?>">Email / SMTP</a>
+    <a href="settings?tab=security" class="tab <?= $tab === 'security' ? 'tab-active' : '' ?>">Security</a>
+    <a href="settings?tab=logins" class="tab <?= $tab === 'logins' ? 'tab-active' : '' ?>">Login History</a>
+    <a href="settings?tab=media" class="tab <?= $tab === 'media' ? 'tab-active' : '' ?>">Media</a>
+    <a href="settings?tab=backup" class="tab <?= $tab === 'backup' ? 'tab-active' : '' ?>">Backup</a>
+    <a href="settings?tab=maintenance" class="tab <?= $tab === 'maintenance' ? 'tab-active' : '' ?>">Maintenance</a>
 </div>
 
 <!-- ==================== GENERAL ==================== -->
@@ -107,6 +108,137 @@ renderHeader('Settings', 'settings');
         <span class="settings-saved" id="saveStatus"></span>
     </div>
 </form>
+<?php endif; ?>
+
+<!-- ==================== BRANDING ==================== -->
+<?php if ($tab === 'branding'):
+    $logoPath = realpath(__DIR__ . '/../assets/images/qor-logo.png');
+    $faviconPath = realpath(__DIR__ . '/../assets/images/favicon.png');
+    $hasFavicon = $faviconPath && file_exists($faviconPath);
+?>
+<div class="card" style="margin-bottom:20px;">
+    <div class="card-header"><h2>Site Logo</h2></div>
+    <div class="card-body">
+        <p class="settings-note">Upload a new logo. This replaces the logo across the entire site — navbar, footer, and admin sidebar.</p>
+        <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;">
+            <div style="background:var(--bg-tertiary);border-radius:12px;padding:20px;text-align:center;min-width:160px;">
+                <img src="../assets/images/qor-logo.png?v=<?= time() ?>" alt="Current Logo" style="max-height:80px;max-width:200px;" id="logoPreview">
+                <p style="font-size:0.75rem;color:var(--text-muted);margin-top:8px;">Current Logo</p>
+            </div>
+            <div style="flex:1;min-width:250px;">
+                <form id="logoForm" enctype="multipart/form-data">
+                    <?= csrfField() ?>
+                    <div class="form-group">
+                        <label>Upload New Logo</label>
+                        <input type="file" name="file" accept="image/png,image/svg+xml,image/webp,image/jpeg" id="logoFile" required>
+                        <span style="font-size:0.7rem;color:var(--text-muted)">Recommended: PNG or SVG with transparent background. Max 2 MB.</span>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">Upload Logo</button>
+                    <span id="logoStatus" style="margin-left:8px;font-size:0.85rem;"></span>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><h2>Favicon</h2></div>
+    <div class="card-body">
+        <p class="settings-note">Upload a favicon (browser tab icon). Recommended: square PNG, at least 64 &times; 64 px.</p>
+        <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;">
+            <div style="background:var(--bg-tertiary);border-radius:12px;padding:20px;text-align:center;min-width:120px;">
+                <?php if ($hasFavicon): ?>
+                <img src="../assets/images/favicon.png?v=<?= time() ?>" alt="Current Favicon" style="width:48px;height:48px;image-rendering:pixelated;" id="faviconPreview">
+                <?php else: ?>
+                <div style="width:48px;height:48px;background:var(--bg-secondary);border-radius:8px;display:inline-flex;align-items:center;justify-content:center;" id="faviconPreview">
+                    <svg viewBox="0 0 20 20" fill="var(--text-muted)" width="24" height="24"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/></svg>
+                </div>
+                <?php endif; ?>
+                <p style="font-size:0.75rem;color:var(--text-muted);margin-top:8px;"><?= $hasFavicon ? 'Current Favicon' : 'No favicon set' ?></p>
+            </div>
+            <div style="flex:1;min-width:250px;">
+                <form id="faviconForm" enctype="multipart/form-data">
+                    <?= csrfField() ?>
+                    <div class="form-group">
+                        <label>Upload Favicon</label>
+                        <input type="file" name="file" accept="image/png,image/x-icon,image/svg+xml,image/webp" id="faviconFile" required>
+                        <span style="font-size:0.7rem;color:var(--text-muted)">PNG, ICO, SVG, or WebP. Square image recommended. Max 1 MB.</span>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">Upload Favicon</button>
+                    <span id="faviconStatus" style="margin-left:8px;font-size:0.85rem;"></span>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Logo upload
+document.getElementById('logoForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const status = document.getElementById('logoStatus');
+    const file = document.getElementById('logoFile').files[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { status.textContent = 'File too large (max 2 MB).'; status.style.color = 'var(--red)'; return; }
+
+    status.textContent = 'Uploading...';
+    status.style.color = 'var(--text-muted)';
+
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('csrf_token', '<?= generateCSRFToken() ?>');
+
+    fetch('api/settings?action=upload_logo', { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(d => {
+            if (d.success) {
+                status.textContent = 'Logo updated!';
+                status.style.color = 'var(--green)';
+                document.getElementById('logoPreview').src = '../assets/images/qor-logo.png?v=' + Date.now();
+                document.querySelector('.sidebar-logo').src = '../assets/images/qor-logo.png?v=' + Date.now();
+            } else {
+                status.textContent = d.error || 'Upload failed.';
+                status.style.color = 'var(--red)';
+            }
+        })
+        .catch(() => { status.textContent = 'Connection error.'; status.style.color = 'var(--red)'; });
+});
+
+// Favicon upload
+document.getElementById('faviconForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const status = document.getElementById('faviconStatus');
+    const file = document.getElementById('faviconFile').files[0];
+    if (!file) return;
+    if (file.size > 1 * 1024 * 1024) { status.textContent = 'File too large (max 1 MB).'; status.style.color = 'var(--red)'; return; }
+
+    status.textContent = 'Uploading...';
+    status.style.color = 'var(--text-muted)';
+
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('csrf_token', '<?= generateCSRFToken() ?>');
+
+    fetch('api/settings?action=upload_favicon', { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(d => {
+            if (d.success) {
+                status.textContent = 'Favicon updated!';
+                status.style.color = 'var(--green)';
+                const preview = document.getElementById('faviconPreview');
+                if (preview.tagName === 'IMG') {
+                    preview.src = '../assets/images/favicon.png?v=' + Date.now();
+                } else {
+                    preview.outerHTML = '<img src="../assets/images/favicon.png?v=' + Date.now() + '" alt="Favicon" style="width:48px;height:48px;" id="faviconPreview">';
+                }
+            } else {
+                status.textContent = d.error || 'Upload failed.';
+                status.style.color = 'var(--red)';
+            }
+        })
+        .catch(() => { status.textContent = 'Connection error.'; status.style.color = 'var(--red)'; });
+});
+</script>
 <?php endif; ?>
 
 <!-- ==================== EMAIL / SMTP ==================== -->
@@ -423,7 +555,7 @@ renderHeader('Settings', 'settings');
     <div class="card-body">
         <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:16px;">Download a full SQL dump of your database. This includes all tables, data, and structure.</p>
         <div style="display:flex;gap:12px;flex-wrap:wrap;">
-            <a href="api/settings.php?action=backup_full" class="btn btn-primary">
+            <a href="api/settings?action=backup_full" class="btn btn-primary">
                 <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
                 Download Full Backup (.sql)
             </a>
@@ -435,7 +567,7 @@ renderHeader('Settings', 'settings');
     <div class="card-header"><h2>Restore from Backup</h2></div>
     <div class="card-body">
         <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:16px;">Upload a .sql file to restore your database. <strong style="color:var(--red);">This will overwrite existing data.</strong></p>
-        <form method="POST" action="api/settings.php?action=restore" enctype="multipart/form-data" onsubmit="return confirm('WARNING: This will overwrite your database. Are you absolutely sure?')">
+        <form method="POST" action="api/settings?action=restore" enctype="multipart/form-data" onsubmit="return confirm('WARNING: This will overwrite your database. Are you absolutely sure?')">
             <?= csrfField() ?>
             <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
                 <div class="form-group" style="flex:1;margin:0;">
@@ -482,7 +614,7 @@ renderHeader('Settings', 'settings');
                         <td><?= $tblSize ?></td>
                         <td>
                             <?php if (is_numeric($cnt)): ?>
-                            <a href="api/settings.php?action=backup_table&table=<?= urlencode($tbl) ?>" class="btn btn-secondary btn-sm">Export</a>
+                            <a href="api/settings?action=backup_table&table=<?= urlencode($tbl) ?>" class="btn btn-secondary btn-sm">Export</a>
                             <?php else: ?>
                             <span class="text-muted">N/A</span>
                             <?php endif; ?>
@@ -665,7 +797,7 @@ renderHeader('Settings', 'settings');
 <?php endif; ?>
 
 <script>
-const API = 'api/settings.php';
+const API = 'api/settings';
 const csrf = '<?= generateCSRFToken() ?>';
 
 // Save settings
@@ -743,7 +875,7 @@ function forceLogoutAll() {
     .then(d => {
         result.textContent = d.success ? 'All sessions invalidated. Redirecting...' : (d.error || 'Failed.');
         result.style.color = d.success ? 'var(--green)' : 'var(--red)';
-        if (d.success) setTimeout(() => window.location = 'index.php', 1500);
+        if (d.success) setTimeout(() => window.location = '.', 1500);
     });
 }
 

@@ -14,7 +14,7 @@ if (isPost()) {
     $token = $_POST[CSRF_TOKEN_NAME] ?? '';
     if (!validateCSRF($token)) {
         setFlash('error', 'Invalid request.');
-        redirect('users.php');
+        redirect('users');
     }
 
     $action = $_POST['action'] ?? '';
@@ -71,7 +71,7 @@ if (isPost()) {
                 setFlash('success', "Admin '{$name}' created successfully.");
             }
         }
-        redirect('users.php');
+        redirect('users');
     }
 
     if ($action === 'edit') {
@@ -100,7 +100,7 @@ if (isPost()) {
                 setFlash('success', "Admin '{$name}' updated.");
             }
         }
-        redirect('users.php');
+        redirect('users');
     }
 
     if ($action === 'toggle_status') {
@@ -120,7 +120,7 @@ if (isPost()) {
                 setFlash('success', "Admin '{$target['name']}' {$statusText}.");
             }
         }
-        redirect('users.php');
+        redirect('users');
     }
 
     if ($action === 'reset_password') {
@@ -135,7 +135,7 @@ if (isPost()) {
             logActivity($admin['id'], 'reset_password', 'admin', $userId);
             setFlash('success', 'Password has been reset.');
         }
-        redirect('users.php');
+        redirect('users');
     }
 
     if ($action === 'delete_admin') {
@@ -152,7 +152,7 @@ if (isPost()) {
                 setFlash('success', "Admin '{$target['name']}' deleted permanently.");
             }
         }
-        redirect('users.php');
+        redirect('users');
     }
 
     if ($action === 'force_reset_user') {
@@ -161,7 +161,7 @@ if (isPost()) {
         $db->prepare('UPDATE admins SET force_password_reset = 1 WHERE id = ?')->execute([$userId]);
         logActivity($admin['id'], 'force_reset_user', 'admin', $userId);
         setFlash('success', 'User will be required to change password on next login.');
-        redirect('users.php');
+        redirect('users');
     }
 
     if ($action === 'reset_2fa') {
@@ -169,7 +169,7 @@ if (isPost()) {
         $db->prepare('UPDATE admins SET totp_secret = NULL, totp_enabled = 0, recovery_codes = NULL WHERE id = ?')->execute([$userId]);
         logActivity($admin['id'], 'reset_2fa', 'admin', $userId);
         setFlash('success', '2FA has been reset for this admin.');
-        redirect('users.php');
+        redirect('users');
     }
 }
 
@@ -235,8 +235,8 @@ renderHeader('Admin Users', 'users');
 </div>
 
 <div class="tabs">
-    <a href="users.php?tab=users" class="tab <?= $tab === 'users' ? 'tab-active' : '' ?>">Users</a>
-    <a href="users.php?tab=roles" class="tab <?= $tab === 'roles' ? 'tab-active' : '' ?>">Roles & Permissions</a>
+    <a href="users?tab=users" class="tab <?= $tab === 'users' ? 'tab-active' : '' ?>">Users</a>
+    <a href="users?tab=roles" class="tab <?= $tab === 'roles' ? 'tab-active' : '' ?>">Roles & Permissions</a>
 </div>
 
 <?php if ($tab === 'roles'): ?>
@@ -382,7 +382,7 @@ renderHeader('Admin Users', 'users');
                                 <div class="dropdown-menu">
                                     <button class="dropdown-item" onclick="this.closest('.dropdown-menu').classList.remove('show');openEditModal(<?= htmlspecialchars(json_encode($user)) ?>)">Edit Details</button>
                                     <button class="dropdown-item" onclick="this.closest('.dropdown-menu').classList.remove('show');openResetModal(<?= $user['id'] ?>, '<?= sanitize($user['name']) ?>')">Reset Password</button>
-                                    <a href="activity.php?admin=<?= $user['id'] ?>" class="dropdown-item">View Activity</a>
+                                    <a href="activity?admin=<?= $user['id'] ?>" class="dropdown-item">View Activity</a>
                                     <div class="dropdown-divider"></div>
                                     <form method="POST"><input type="hidden" name="<?= CSRF_TOKEN_NAME ?>" value="<?= generateCSRFToken() ?>"><input type="hidden" name="action" value="toggle_status"><input type="hidden" name="user_id" value="<?= $user['id'] ?>"><button type="submit" class="dropdown-item"><?= $user['is_active'] ? 'Deactivate' : 'Activate' ?> Account</button></form>
                                     <form method="POST" onsubmit="return confirm('Force password change on next login?')"><input type="hidden" name="<?= CSRF_TOKEN_NAME ?>" value="<?= generateCSRFToken() ?>"><input type="hidden" name="action" value="force_reset_user"><input type="hidden" name="user_id" value="<?= $user['id'] ?>"><button type="submit" class="dropdown-item">Force Password Reset</button></form>

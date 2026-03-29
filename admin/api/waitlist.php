@@ -148,7 +148,7 @@ if ($action === 'delete' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = $_POST[CSRF_TOKEN_NAME] ?? '';
     if (!validateCSRF($token)) {
         setFlash('error', 'Invalid request.');
-        redirect('../waitlist.php');
+        redirect('../waitlist');
     }
 
     $id = (int)($_POST['id'] ?? 0);
@@ -161,7 +161,7 @@ if ($action === 'delete' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         logActivity($_SESSION['admin_id'], 'delete_waitlist', 'waitlist', $id);
         setFlash('success', 'Entry deleted.');
     }
-    redirect('../waitlist.php');
+    redirect('../waitlist');
 }
 
 // ===== ADMIN: Bulk Delete =====
@@ -173,7 +173,7 @@ if ($action === 'bulk_delete' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = $_POST[CSRF_TOKEN_NAME] ?? '';
     if (!validateCSRF($token)) {
         setFlash('error', 'Invalid request.');
-        redirect('../waitlist.php');
+        redirect('../waitlist');
     }
 
     $ids = $_POST['ids'] ?? [];
@@ -188,7 +188,7 @@ if ($action === 'bulk_delete' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         logActivity($_SESSION['admin_id'], 'bulk_delete_waitlist', 'waitlist', null, ['count' => count($intIds)]);
         setFlash('success', count($intIds) . ' entries deleted.');
     }
-    redirect('../waitlist.php');
+    redirect('../waitlist');
 }
 
 // ===== ADMIN: Update Status =====
@@ -200,7 +200,7 @@ if ($action === 'update_status' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = $_POST[CSRF_TOKEN_NAME] ?? '';
     if (!validateCSRF($token)) {
         setFlash('error', 'Invalid request.');
-        redirect('../waitlist.php');
+        redirect('../waitlist');
     }
 
     $id = (int)($_POST['id'] ?? 0);
@@ -216,7 +216,7 @@ if ($action === 'update_status' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         logActivity($_SESSION['admin_id'], 'update_waitlist_status', 'waitlist', $id, ['status' => $newStatus]);
         setFlash('success', 'Status updated to ' . ucfirst($newStatus) . '.');
     }
-    redirect('../waitlist.php');
+    redirect('../waitlist');
 }
 
 // ===== ADMIN: Bulk Status Update =====
@@ -228,7 +228,7 @@ if ($action === 'bulk_status' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = $_POST[CSRF_TOKEN_NAME] ?? '';
     if (!validateCSRF($token)) {
         setFlash('error', 'Invalid request.');
-        redirect('../waitlist.php');
+        redirect('../waitlist');
     }
 
     $ids = $_POST['ids'] ?? [];
@@ -247,7 +247,7 @@ if ($action === 'bulk_status' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         logActivity($_SESSION['admin_id'], 'bulk_update_waitlist_status', 'waitlist', null, ['count' => count($intIds), 'status' => $newStatus]);
         setFlash('success', count($intIds) . ' entries updated to ' . ucfirst($newStatus) . '.');
     }
-    redirect('../waitlist.php');
+    redirect('../waitlist');
 }
 
 // ===== ADMIN: Save Notes =====
@@ -285,7 +285,7 @@ if ($action === 'resend_email' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = $_POST[CSRF_TOKEN_NAME] ?? '';
     if (!validateCSRF($token)) {
         setFlash('error', 'Invalid request.');
-        redirect('../waitlist.php');
+        redirect('../waitlist');
     }
 
     $id = (int)($_POST['id'] ?? 0);
@@ -312,7 +312,7 @@ if ($action === 'resend_email' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     }
-    redirect('../waitlist.php');
+    redirect('../waitlist');
 }
 
 // ===== ADMIN: Get single entry (AJAX) =====

@@ -14,7 +14,7 @@ if ($id) {
     $stmt = $db->prepare('SELECT * FROM campaigns WHERE id = ?');
     $stmt->execute([$id]);
     $campaign = $stmt->fetch();
-    if (!$campaign) { setFlash('error', 'Campaign not found.'); redirect('newsletter.php?tab=campaigns'); }
+    if (!$campaign) { setFlash('error', 'Campaign not found.'); redirect('newsletter?tab=campaigns'); }
 }
 
 $activeCount = $db->query("SELECT COUNT(*) FROM subscribers WHERE status = 'active'")->fetchColumn();
@@ -28,13 +28,13 @@ renderHeader($pageTitle, 'newsletter');
 ?>
 
 <div class="msg-back">
-    <a href="newsletter.php?tab=campaigns" class="btn btn-ghost btn-sm">
+    <a href="newsletter?tab=campaigns" class="btn btn-ghost btn-sm">
         <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/></svg>
         Back to Campaigns
     </a>
 </div>
 
-<form method="POST" action="api/newsletter.php?action=save_campaign" id="campaignForm">
+<form method="POST" action="api/newsletter?action=save_campaign" id="campaignForm">
     <?= csrfField() ?>
     <?php if ($campaign): ?><input type="hidden" name="id" value="<?= $campaign['id'] ?>"><?php endif; ?>
     <textarea name="content" id="contentHidden" style="display:none"><?= htmlspecialchars($campaign['content'] ?? '') ?></textarea>
@@ -215,11 +215,11 @@ renderHeader($pageTitle, 'newsletter');
                     <button type="submit" class="btn btn-primary btn-full" onclick="syncContent()"><?= $campaign ? 'Update' : 'Save' ?> Campaign</button>
 
                     <?php if ($campaign && $campaign['status'] !== 'sent'): ?>
-                    <a href="ab-test.php?campaign_id=<?= $campaign['id'] ?>" class="btn btn-secondary btn-full" style="margin-top:8px;">A/B Test Subject</a>
+                    <a href="ab-test?campaign_id=<?= $campaign['id'] ?>" class="btn btn-secondary btn-full" style="margin-top:8px;">A/B Test Subject</a>
                     <?php endif; ?>
 
                     <?php if ($campaign): ?>
-                    <form method="POST" action="campaign-templates.php?action=save_as_template" style="margin-top:8px;">
+                    <form method="POST" action="campaign-templates?action=save_as_template" style="margin-top:8px;">
                         <?= csrfField() ?>
                         <input type="hidden" name="name" value="<?= sanitize($campaign['subject']) ?>">
                         <input type="hidden" name="subject" value="<?= sanitize($campaign['subject']) ?>">
@@ -609,7 +609,7 @@ function runAiGenerate() {
     btn.textContent = 'Generating...';
     btn.disabled = true;
 
-    fetch('api/email.php?action=ai_generate', {
+    fetch('api/email?action=ai_generate', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({

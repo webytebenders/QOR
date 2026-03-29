@@ -3,7 +3,7 @@
  * Auto-injected by the admin panel chatbot deploy feature
  */
 (function() {
-    const API_BASE = (document.currentScript?.src || '').replace('/assets/js/chatwidget.js', '/api/chat.php');
+    const API_BASE = (document.currentScript?.src || '').replace('/assets/js/chatwidget.js', '/api/chat');
     if (!API_BASE) return;
 
     let sessionToken = null;

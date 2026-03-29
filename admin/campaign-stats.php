@@ -8,12 +8,12 @@ $db = getDB();
 try { $db->exec(file_get_contents(__DIR__ . '/includes/schema_subscribers.sql')); } catch (Exception $e) {}
 
 $id = (int)($_GET['id'] ?? 0);
-if (!$id) { redirect('newsletter.php?tab=campaigns'); }
+if (!$id) { redirect('newsletter?tab=campaigns'); }
 
 $stmt = $db->prepare('SELECT c.*, a.name as author_name FROM campaigns c JOIN admins a ON c.author_id = a.id WHERE c.id = ?');
 $stmt->execute([$id]);
 $campaign = $stmt->fetch();
-if (!$campaign) { setFlash('error', 'Campaign not found.'); redirect('newsletter.php?tab=campaigns'); }
+if (!$campaign) { setFlash('error', 'Campaign not found.'); redirect('newsletter?tab=campaigns'); }
 
 // Core stats
 $sent = (int)$campaign['sent_count'];
@@ -86,7 +86,7 @@ renderHeader('Campaign Stats', 'newsletter');
 ?>
 
 <div class="msg-back">
-    <a href="newsletter.php?tab=campaigns" class="btn btn-ghost btn-sm">
+    <a href="newsletter?tab=campaigns" class="btn btn-ghost btn-sm">
         <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/></svg>
         Back to Campaigns
     </a>
